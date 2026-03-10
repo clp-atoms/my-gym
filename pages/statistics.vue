@@ -465,6 +465,7 @@ import { useWorkoutStore } from "~/stores/workoutStore";
 
 const workoutStore = useWorkoutStore();
 const { supabase } = useSupabase();
+const authStore = useAuthStore();
 
 const loading = ref(false);
 const selectedWorkoutPlanId = ref<string | null>(null);
@@ -522,6 +523,7 @@ onMounted(async () => {
     const { data: workoutPlansData, error: workoutPlansError } = await supabase
       .from("workout_plans")
       .select("*")
+      .eq("user_id", authStore.userId)
       .order("created_at", { ascending: false });
 
     if (workoutPlansError) throw workoutPlansError;
@@ -543,7 +545,8 @@ onMounted(async () => {
 
     const { data: exercisesData, error: exercisesError } = await supabase
       .from("exercises")
-      .select("*");
+      .select("*")
+      .eq("user_id", authStore.userId);
 
     if (exercisesError) throw exercisesError;
 
@@ -567,6 +570,7 @@ onMounted(async () => {
       await supabase
         .from("weight_history")
         .select("*")
+        .eq("user_id", authStore.userId)
         .order("date", { ascending: true });
 
     if (weightHistoryError) throw weightHistoryError;

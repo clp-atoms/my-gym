@@ -607,6 +607,7 @@ import { useWorkoutStore } from "~/stores/workoutStore";
 const route = useRoute();
 const workoutStore = useWorkoutStore();
 const { supabase } = useSupabase();
+const authStore = useAuthStore();
 
 const loading = ref(false);
 const isModalExerciseOpen = ref(false);
@@ -652,7 +653,8 @@ onMounted(async () => {
     if (workoutStore.workoutPlans.length === 0) {
       const { data: plansData, error: plansError } = await supabase
         .from("workout_plans")
-        .select("*");
+        .select("*")
+        .eq("user_id", authStore.userId);
 
       if (plansError) throw plansError;
 
@@ -670,7 +672,8 @@ onMounted(async () => {
     const { data, error } = await supabase
       .from("exercises")
       .select("*")
-      .eq("workout_plan_id", workoutPlanId);
+      .eq("workout_plan_id", workoutPlanId)
+      .eq("user_id", authStore.userId);
 
     if (error) throw error;
 
@@ -697,7 +700,8 @@ onMounted(async () => {
 
     const { data: weightHistory, error: weightHistoryError } = await supabase
       .from("weight_history")
-      .select("*");
+      .select("*")
+      .eq("user_id", authStore.userId);
 
     if (weightHistoryError) throw weightHistoryError;
 
@@ -733,6 +737,7 @@ const createExercise = async () => {
       .insert([
         {
           workout_plan_id: workoutPlanId,
+          user_id: authStore.userId,
           name: newExercise.value.name,
           equipment: newExercise.value.equipment,
           description: newExercise.value.description || null,
@@ -753,6 +758,7 @@ const createExercise = async () => {
       await supabase.from("weight_history").insert([
         {
           exercise_id: data[0].id,
+          user_id: authStore.userId,
           weight: newExercise.value.current_weight || 0,
           date: new Date().toISOString(),
         },
@@ -833,6 +839,7 @@ const saveExerciseChanges = async () => {
         .insert([
           {
             exercise_id: editingExercise.value.id,
+            user_id: authStore.userId,
             weight: editingExercise.value.current_weight || 0,
             date: new Date().toISOString(),
           },
@@ -877,6 +884,7 @@ const updateWeight = async () => {
       .insert([
         {
           exercise_id: selectedExercise.value.id,
+          user_id: authStore.userId,
           weight: newWeight.value,
           date: new Date().toISOString(),
         },

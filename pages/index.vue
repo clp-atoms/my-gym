@@ -244,6 +244,7 @@ import { useWorkoutStore } from "~/stores/workoutStore";
 
 const workoutStore = useWorkoutStore();
 const { supabase } = useSupabase();
+const authStore = useAuthStore();
 
 const loading = ref(false);
 const isModalOpen = ref(false);
@@ -260,9 +261,11 @@ const lastWorkoutPlan = computed(() => workoutStore.lastWorkoutPlan);
 onMounted(async () => {
   loading.value = true;
   try {
+    // Get workout plans for current user
     const { data, error } = await supabase
       .from("workout_plans")
       .select("*")
+      .eq("user_id", authStore.userId)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
@@ -281,10 +284,11 @@ onMounted(async () => {
     // Load the last workout plan executed from localStorage (after plans are loaded)
     workoutStore.loadLastWorkoutPlanId();
 
-    // Load all exercises
+    // Load all exercises for current user
     const { data: exercises, error: exercisesError } = await supabase
       .from("exercises")
-      .select("*");
+      .select("*")
+      .eq("user_id", authStore.userId);
 
     if (exercisesError) throw exercisesError;
 
@@ -325,6 +329,7 @@ const createWorkoutPlan = async () => {
         {
           name: newWorkoutPlan.value.name,
           description: newWorkoutPlan.value.description,
+          user_id: authStore.userId,
           created_at: new Date().toISOString(),
         },
       ])

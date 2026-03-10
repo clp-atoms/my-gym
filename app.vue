@@ -34,6 +34,21 @@
               Statistics
             </NuxtLink>
           </nav>
+
+          <!-- User Menu -->
+          <div v-if="authStore.isAuthenticated" class="flex items-center gap-4">
+            <div class="hidden md:flex flex-col items-end">
+              <p class="text-sm font-medium text-slate-900 dark:text-white">
+                {{ authStore.userEmail }}
+              </p>
+            </div>
+            <button
+              @click="handleLogout"
+              class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors font-medium text-sm"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -75,4 +90,19 @@
 
 <script setup lang="ts">
 import "~/assets/css/main.css";
+
+const authStore = useAuthStore();
+const router = useRouter();
+
+onMounted(async () => {
+  // Initialize authentication on app load
+  if (!authStore.user) {
+    await authStore.initializeAuth();
+  }
+});
+
+const handleLogout = async () => {
+  await authStore.signOut();
+  await router.push("/login");
+};
 </script>
