@@ -1,4 +1,4 @@
-const CACHE_NAME = "mygym-v1";
+const CACHE_NAME = "mygym-v" + new Date().toISOString().split("T")[0];
 const URLS_TO_CACHE = [
   "/",
   "/login",
@@ -20,6 +20,14 @@ self.addEventListener("install", (event) => {
     }),
   );
   self.skipWaiting();
+  // Notify all clients that a new version is available
+  self.clients.matchAll().then((clients) => {
+    clients.forEach((client) => {
+      client.postMessage({
+        type: "SKIP_WAITING",
+      });
+    });
+  });
 });
 
 // Activate event - clean up old caches

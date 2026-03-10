@@ -172,17 +172,88 @@
           </p>
         </div>
       </footer>
+
+      <!-- PWA Update Notification -->
+      <transition
+        enter-active-class="transition ease-out duration-300"
+        leave-active-class="transition ease-in duration-200"
+        enter-from-class="opacity-0 translate-y-4"
+        leave-to-class="opacity-0 translate-y-4"
+      >
+        <div
+          v-if="showPwaUpdate"
+          class="fixed bottom-6 right-6 z-[2000] max-w-sm bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+        >
+          <div
+            class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-5 py-3 text-white font-medium text-sm flex items-center gap-2"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            App Update Available
+          </div>
+          <div class="px-5 py-4">
+            <p class="text-slate-700 dark:text-slate-300 text-sm mb-4">
+              A new version of MyGym is available. Reload to get the latest
+              updates and features.
+            </p>
+            <div class="flex gap-3">
+              <button
+                @click="handleUpdateReload"
+                class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium text-sm transition-colors"
+              >
+                Reload Now
+              </button>
+              <button
+                @click="dismissPwaUpdate"
+                class="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium text-sm transition-colors"
+              >
+                Later
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import "~/assets/css/main.css";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
 const isMenuOpen = ref(false);
+const showPwaUpdate = ref(false);
+
+// Listen for PWA updates
+onMounted(() => {
+  window.addEventListener("pwa-update-available", () => {
+    showPwaUpdate.value = true;
+  });
+});
+
+const handleUpdateReload = () => {
+  // Ask the service worker to skip waiting and take control immediately
+  if (navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: "SKIP_WAITING",
+    });
+  }
+  // Reload the page after a short delay to ensure new SW is activated
+  setTimeout(() => {
+    window.location.reload();
+  }, 500);
+};
+
+const dismissPwaUpdate = () => {
+  showPwaUpdate.value = false;
+};
 
 // PWA Meta Tags
 useHead({
