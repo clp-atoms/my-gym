@@ -15,4 +15,13 @@ export default defineNuxtConfig({
   ui: {
     icons: ["heroicons", "simple-icons"],
   },
+  vite: {
+    server: {
+      hmr: {
+        protocol: "ws",
+        host: "localhost",
+        port: 3000,
+      },
+    },
+  },
 });

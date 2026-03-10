@@ -1,50 +1,74 @@
-export default defineNuxtPlugin(() => {
-  if (process.client && "serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("/service-worker.js")
-        .then((registration) => {
-          console.log("Service Worker registered:", registration);
+export default defineNuxtPlugin((nuxtApp) => {
+  console.log("[PWA] Plugin: Starting initialization");
 
-          // Check for updates periodically
-          const updateCheckInterval = setInterval(() => {
-            registration.update();
-          }, 60000); // Check every minute
-
-          // Listen for updates
-          registration.addEventListener("updatefound", () => {
-            const newWorker = registration.installing;
-
-            newWorker?.addEventListener("statechange", () => {
-              if (
-                newWorker.state === "installed" &&
-                navigator.serviceWorker.controller
-              ) {
-                // New service worker is ready, dispatch custom event
-                const updateEvent = new CustomEvent("pwa-update-available", {
-                  detail: { registration },
-                });
-                window.dispatchEvent(updateEvent);
-                console.log("PWA update available");
-              }
-            });
-          });
-
-          // Listen for messages from service worker
-          navigator.serviceWorker.addEventListener("message", (event) => {
-            if (event.data?.type === "SKIP_WAITING") {
-              // New service worker is waiting, notify user
-              const event = new CustomEvent("pwa-update-available");
-              window.dispatchEvent(event);
-            }
-          });
-
-          // Cleanup interval on plugin destroy
-          return () => clearInterval(updateCheckInterval);
-        })
-        .catch((error) => {
-          console.warn("Service Worker registration failed:", error);
-        });
-    });
+  if (!process.client) {
+    console.log("[PWA] Plugin: Not client-side, returning");
+    return;
   }
+  console.log("[PWA] Plugin: Client-side detected");
+
+  if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) {
+    console.log("[PWA] Plugin: ServiceWorker not available");
+    return;
+  }
+  console.log("[PWA] Plugin: ServiceWorker API available");
+
+  // Use app:mounted hook to ensure DOM is ready
+  nuxtApp.hook("app:mounted", () => {
+    console.log("[PWA] Plugin: App mounted, registering SW");
+    registerServiceWorker();
+  });
 });
+
+function registerServiceWorker() {
+  navigator.serviceWorker
+    .register("/service-worker.js", { scope: "/" })
+    .then((registration) => {
+      console.log("[PWA] Plugin: Service Worker registered successfully");
+
+      const isDev = process.env.NODE_ENV === "development";
+      const updateCheckInterval = isDev ? 5000 : 10 * 60 * 1000;
+
+      const intervalId = setInterval(() => {
+        registration.update().catch(() => {});
+      }, updateCheckInterval);
+
+      window.addEventListener("focus", () => {
+        registration.update();
+      });
+
+      navigator.serviceWorker.addEventListener("message", (event) => {
+        console.log("[PWA] Plugin: Message from SW:", event.data);
+        if (event.data?.type === "TEST_AVAILABLE") {
+          console.log("[PWA] Plugin: Dispatching pwa-update-available event");
+          const updateEvent = new CustomEvent("pwa-update-available", {
+            detail: { registration },
+          });
+          window.dispatchEvent(updateEvent);
+        }
+      });
+
+      registration.addEventListener("updatefound", () => {
+        const newWorker = registration.installing;
+        newWorker?.addEventListener("statechange", () => {
+          if (
+            newWorker.state === "installed" &&
+            navigator.serviceWorker.controller
+          ) {
+            console.log("[PWA] Plugin: New SW ready, dispatching event");
+            const updateEvent = new CustomEvent("pwa-update-available", {
+              detail: { registration },
+            });
+            window.dispatchEvent(updateEvent);
+          }
+        });
+      });
+
+      window.addEventListener("beforeunload", () => {
+        clearInterval(intervalId);
+      });
+    })
+    .catch((error) => {
+      console.warn("[PWA] Plugin: Registration failed:", error);
+    });
+}
