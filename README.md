@@ -11,6 +11,7 @@ A modern web app to manage gym workout plans with **Nuxt 4**, **Vue 3**, and **S
 - ✅ **User Authentication** - Secure login with Supabase Auth
 - ✅ **Data Isolation** - Each user sees only their own data (RLS enabled)
 - ✅ **Weight History Tracking** - Complete record of your strength evolution
+- ✅ **Cross-Device Sync** - Last opened workout plan synced across devices/browsers via Supabase
 - ✅ **Responsive Design** - Mobile, tablet, and desktop optimized
 - ✅ **Dark Mode** - Built-in dark theme
 - ✅ **Zero Maintenance Costs** - Supabase free tier + Netlify free tier
@@ -63,6 +64,7 @@ Run the SQL from [SUPABASE_COMPLETE_SETUP.md](./SUPABASE_COMPLETE_SETUP.md) in S
 - `workout_plans` - Your training routines
 - `exercises` - Individual exercises in a plan
 - `weight_history` - Track weight progression per exercise
+- `user_preferences` - Store user preferences (last workout plan opened, synced across devices)
 
 #### Enable Row Level Security (RLS)
 

@@ -135,21 +135,59 @@ export const useWorkoutStore = defineStore("workout", {
       this.exercises = this.exercises.filter((e) => e.id !== exerciseId);
     },
 
-    setLastWorkoutPlanId(workoutPlanId: string | null) {
+    async setLastWorkoutPlanId(workoutPlanId: string | null) {
       this.lastWorkoutPlanId = workoutPlanId;
-      if (process.client) {
-        if (workoutPlanId) {
-          localStorage.setItem("lastWorkoutPlanId", workoutPlanId);
-        } else {
-          localStorage.removeItem("lastWorkoutPlanId");
+
+      try {
+        const { supabase } = useSupabase();
+        const authStore = useAuthStore();
+
+        if (authStore.userId) {
+          const { error } = await supabase
+            .from("user_preferences")
+            .upsert(
+              {
+                user_id: authStore.userId,
+                last_workout_plan_id: workoutPlanId,
+              },
+              { onConflict: "user_id" },
+            );
+
+          if (error) {
+            console.error("Error saving last workout plan to DB:", error);
+          }
         }
+      } catch (error) {
+        console.error("Error in setLastWorkoutPlanId:", error);
       }
     },
 
-    loadLastWorkoutPlanId() {
-      if (process.client) {
-        const savedScheduleId = localStorage.getItem("lastWorkoutPlanId");
-        this.lastWorkoutPlanId = savedScheduleId;
+    async loadLastWorkoutPlanId() {
+      try {
+        const { supabase } = useSupabase();
+        const authStore = useAuthStore();
+
+        if (authStore.userId) {
+          const { data, error } = await supabase
+            .from("user_preferences")
+            .select("last_workout_plan_id")
+            .eq("user_id", authStore.userId)
+            .single();
+
+          if (error) {
+            // If no preference found, that's OK (first time user)
+            if (error.code !== "PGRST116") {
+              console.error("Error loading last workout plan from DB:", error);
+            }
+            return;
+          }
+
+          if (data?.last_workout_plan_id) {
+            this.lastWorkoutPlanId = data.last_workout_plan_id;
+          }
+        }
+      } catch (error) {
+        console.error("Error in loadLastWorkoutPlanId:", error);
       }
     },
   },

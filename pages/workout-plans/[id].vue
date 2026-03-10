@@ -716,7 +716,7 @@ onMounted(async () => {
     workoutStore.setWeightHistory(mappedWeightHistory);
 
     // Register this workout plan as the last one executed
-    workoutStore.setLastWorkoutPlanId(workoutPlanId);
+    await workoutStore.setLastWorkoutPlanId(workoutPlanId);
   } catch (error) {
     console.error("Error loading exercises:", error);
   } finally {

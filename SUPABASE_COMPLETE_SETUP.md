@@ -59,6 +59,19 @@ If you prefer to have email confirmation:
 
 ---
 
+## 📊 Database Schema Overview
+
+Before creating the tables, here's what each one does:
+
+| Table                | Purpose                                                                             |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| **workout_plans**    | Store user's workout routines (e.g., "Upper Body", "Lower Body")                    |
+| **exercises**        | Individual exercises within a workout plan (e.g., "Bench Press")                    |
+| **weight_history**   | Track weight progression over time for each exercise                                |
+| **user_preferences** | Store user preferences like `last_workout_plan_id` (synced across devices/browsers) |
+
+---
+
 ## ✅ PHASE 3: Creating Database Tables
 
 ### Step 3.1: Access SQL Editor
@@ -112,6 +125,18 @@ CREATE TABLE IF NOT EXISTS weight_history (
 );
 
 -- ============================================
+-- TABLE: user_preferences
+-- ============================================
+CREATE TABLE IF NOT EXISTS user_preferences (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  last_workout_plan_id UUID,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(user_id)
+);
+
+-- ============================================
 -- INDEXES FOR PERFORMANCE
 -- ============================================
 CREATE INDEX IF NOT EXISTS workout_plans_user_id_idx ON workout_plans(user_id);
@@ -119,6 +144,7 @@ CREATE INDEX IF NOT EXISTS exercises_user_id_idx ON exercises(user_id);
 CREATE INDEX IF NOT EXISTS exercises_workout_plan_id_idx ON exercises(workout_plan_id);
 CREATE INDEX IF NOT EXISTS weight_history_user_id_idx ON weight_history(user_id);
 CREATE INDEX IF NOT EXISTS weight_history_exercise_id_idx ON weight_history(exercise_id);
+CREATE INDEX IF NOT EXISTS user_preferences_user_id_idx ON user_preferences(user_id);
 ```
 
 4. **Click "Run"** (wait for it to complete)
@@ -131,6 +157,7 @@ CREATE INDEX IF NOT EXISTS weight_history_exercise_id_idx ON weight_history(exer
    - ✅ `workout_plans`
    - ✅ `exercises`
    - ✅ `weight_history`
+   - ✅ `user_preferences`
 
 ---
 
@@ -139,7 +166,7 @@ CREATE INDEX IF NOT EXISTS weight_history_exercise_id_idx ON weight_history(exer
 ### Step 4.1: Enable RLS
 
 1. **Go to Authentication** → **Policies**
-2. **For each table** (`workout_plans`, `exercises`, `weight_history`):
+2. **For each table** (`workout_plans`, `exercises`, `weight_history`, `user_preferences`):
    - Select it
    - Click **"Enable RLS"**
 
@@ -207,6 +234,26 @@ CREATE POLICY "Users can update their own weight history"
 CREATE POLICY "Users can delete their own weight history"
   ON weight_history FOR DELETE
   USING (auth.uid() = user_id);
+
+-- ============================================
+-- POLICIES: user_preferences
+-- ============================================
+CREATE POLICY "Users can see their own preferences"
+  ON user_preferences FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own preferences"
+  ON user_preferences FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own preferences"
+  ON user_preferences FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own preferences"
+  ON user_preferences FOR DELETE
+  USING (auth.uid() = user_id);
 ```
 
 **Click "Run"** and wait for it to complete.
@@ -218,6 +265,7 @@ CREATE POLICY "Users can delete their own weight history"
    - 4 policies for `workout_plans`
    - 4 policies for `exercises`
    - 4 policies for `weight_history`
+   - 4 policies for `user_preferences`
 
 ---
 
