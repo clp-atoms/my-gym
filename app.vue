@@ -94,6 +94,31 @@ import "~/assets/css/main.css";
 const authStore = useAuthStore();
 const router = useRouter();
 
+// PWA Meta Tags
+useHead({
+  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
+  meta: [
+    { name: "theme-color", content: "#059669" },
+    { name: "apple-mobile-web-app-capable", content: "yes" },
+    {
+      name: "apple-mobile-web-app-status-bar-style",
+      content: "black-translucent",
+    },
+    { name: "apple-mobile-web-app-title", content: "MyGym" },
+    {
+      name: "description",
+      content:
+        "MyGym - Gym Workout Tracker. Plan your workouts and track your progress.",
+    },
+    { name: "mobile-web-app-capable", content: "yes" },
+  ],
+  link: [
+    { rel: "manifest", href: "/manifest.json" },
+    { rel: "apple-touch-icon", href: "/icons/icon-192x192.png" },
+    { rel: "icon", type: "image/png", href: "/icons/icon-192x192.png" },
+  ],
+});
+
 onMounted(async () => {
   // Initialize authentication on app load
   if (!authStore.user) {
