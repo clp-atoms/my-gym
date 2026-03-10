@@ -6,14 +6,19 @@ export default defineNuxtPlugin((nuxtApp) => {
     return;
   }
 
-  let authInitialized = false;
-
   // Set up auth state listener - this runs on app initialization
   const { supabase } = useSupabase();
   const authStore = useAuthStore();
 
-  // Listen to auth state changes
-  const { data } = supabase.auth.onAuthStateChange((event, session) => {
+  // Initialize auth from session immediately
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    const user = session?.user || null;
+    authStore.setUser(user);
+    authStore.setAuthCheckComplete(true);
+  });
+
+  // Also listen for future auth state changes
+  supabase.auth.onAuthStateChange((event, session) => {
     const user = session?.user || null;
     authStore.setUser(user);
     authStore.setAuthCheckComplete(true);
@@ -25,12 +30,14 @@ export default defineNuxtPlugin((nuxtApp) => {
       const authStore = useAuthStore();
       const publicRoutes = ["/login"];
 
-      // Wait for auth to be initialized if not already done
-      if (!authStore.authCheckComplete && !authInitialized) {
-        authInitialized = true;
-        // The listener above will set authCheckComplete
-        // Wait a bit for the listener to fire
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      // Wait for auth check to complete before allowing navigation
+      if (!authStore.authCheckComplete) {
+        // Check every 10ms until authCheckComplete is true (max 5 seconds)
+        let attempts = 0;
+        while (!authStore.authCheckComplete && attempts < 500) {
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          attempts++;
+        }
       }
 
       // Check if user is trying to access a protected route
