@@ -1,0 +1,13 @@
+[build]
+  command = "bun run build"
+  functions = "server/api"
+  publish = ".output/public"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[env]
+  NUXT_PUBLIC_SUPABASE_URL = ""
+  NUXT_PUBLIC_SUPABASE_ANON_KEY = ""
