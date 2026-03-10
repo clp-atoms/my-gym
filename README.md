@@ -1,143 +1,110 @@
 # 💪 MyGym - Gym Workout Tracker
 
-Una webapp moderna per gestire schede palestra con Nuxt 4, Vue 3, e Supabase. Monitora l'evoluzione dei tuoi carichi nel tempo con statistiche dettagliate.
+A modern web app to manage gym workout plans with **Nuxt 4**, **Vue 3**, and **Supabase**. Track your strength progression over time with detailed statistics and visual charts.
 
-## Features 🎯
+## ✨ Features
 
-- ✅ Gestione schede di allenamento
-- ✅ Aggiunta/modifica esercizi con attrezzo, ripetizioni e peso
-- ✅ Monitoraggio evoluzione carichi (frecce up/down)
-- ✅ Statistiche dettagliate per scheda
-- ✅ Cronologia pesi per ogni esercizio
-- ✅ Responsive design (mobile, tablet, desktop)
-- ✅ Dark mode
-- ✅ Zero costi di manutenzione (Supabase free tier + Netlify free tier)
+- ✅ **Workout Plan Management** - Create and organize workout routines
+- ✅ **Exercise Tracking** - Add exercises with equipment, sets, reps, and weight
+- ✅ **Weight Progression Monitoring** - Visual charts with color-coded progress (green ↑ increase, orange ↓ decrease)
+- ✅ **Detailed Statistics** - Per-plan insights with KPI cards and weight history
+- ✅ **User Authentication** - Secure login with Supabase Auth
+- ✅ **Data Isolation** - Each user sees only their own data (RLS enabled)
+- ✅ **Weight History Tracking** - Complete record of your strength evolution
+- ✅ **Responsive Design** - Mobile, tablet, and desktop optimized
+- ✅ **Dark Mode** - Built-in dark theme
+- ✅ **Zero Maintenance Costs** - Supabase free tier + Netlify free tier
 
-## Stack Tecnologico
+## 🛠️ Tech Stack
 
 - **Framework**: Nuxt 4
-- **UI**: Vue 3 + Nuxt UI + Tailwind CSS
+- **UI**: Vue 3 + Nuxt UI + Tailwind CSS 4
 - **State Management**: Pinia
+- **Authentication**: Supabase Auth (Email)
 - **Database**: Supabase (PostgreSQL)
 - **Hosting**: Netlify
 - **Package Manager**: Bun
+- **License**: MIT
 
-## Setup Locale
+## 🚀 Quick Start
 
-### 1. Installare Bun (se non già installato)
+### 1. Install Bun (if not already installed)
+
 ```bash
 curl -fsSL https://bun.sh/install | bash
 ```
 
-### 2. Installare dipendenze
+### 2. Install dependencies
+
 ```bash
 bun install
 ```
 
-### 3. Configurare Supabase
+### 3. Configure Supabase
 
-#### 3.1 Creare un account Supabase
-1. Vai su https://supabase.com
-2. Registrati con email o GitHub
-3. Crea un nuovo progetto
+**See the complete detailed guide:** [SUPABASE_COMPLETE_SETUP.md](./SUPABASE_COMPLETE_SETUP.md)
 
-#### 3.2 Copiare le credenziali
-Dalla pagina del progetto → Settings → API:
-- **Project URL** → `NUXT_PUBLIC_SUPABASE_URL`
-- **anon public key** → `NUXT_PUBLIC_SUPABASE_ANON_KEY`
+#### Quick Setup
 
-#### 3.3 Creare il file `.env.local`
-```bash
-cp .env.example .env.local
-```
+1. Create account at https://supabase.com
+2. Create a new project
+3. Go to Settings → API
+4. Copy `Project URL` and `anon public key`
+5. Create `.env.local`:
+   ```bash
+   NUXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NUXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   ```
 
-Poi modifica `.env.local` con le tue credenziali:
-```
-NUXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NUXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-```
+#### Create Database Tables
 
-#### 3.4 Creare schema database
+Run the SQL from [SUPABASE_COMPLETE_SETUP.md](./SUPABASE_COMPLETE_SETUP.md) in Supabase SQL Editor. This creates:
 
-Vai su Supabase → SQL Editor e copia questo SQL:
+- `workout_plans` - Your training routines
+- `exercises` - Individual exercises in a plan
+- `weight_history` - Track weight progression per exercise
 
-```sql
--- Schede
-CREATE TABLE schede (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  nome VARCHAR(255) NOT NULL,
-  descrizione TEXT,
-  data_creazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+#### Enable Row Level Security (RLS)
 
--- Esercizi
-CREATE TABLE esercizi (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  scheda_id UUID NOT NULL REFERENCES schede(id) ON DELETE CASCADE,
-  nome VARCHAR(255) NOT NULL,
-  attrezzo VARCHAR(255) NOT NULL,
-  ripetizioni INT NOT NULL DEFAULT 10,
-  peso_attuale DECIMAL(5, 2) NOT NULL DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+Follow the RLS configuration in [SUPABASE_COMPLETE_SETUP.md](./SUPABASE_COMPLETE_SETUP.md) to ensure users see only their own data.
 
--- Cronologia Pesi
-CREATE TABLE cronologia_pesi (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  esercizio_id UUID NOT NULL REFERENCES esercizi(id) ON DELETE CASCADE,
-  peso DECIMAL(5, 2) NOT NULL,
-  data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+### 4. Start development
 
--- Indici per performance
-CREATE INDEX idx_esercizi_scheda ON esercizi(scheda_id);
-CREATE INDEX idx_cronologia_esercizio ON cronologia_pesi(esercizio_id);
-CREATE INDEX idx_cronologia_data ON cronologia_pesi(data);
-```
-
-Clicca "Run" per eseguire gli script.
-
-#### 3.5 Abilitare RLS (Row Level Security) - Opzionale
-
-Se vuoi multi-utente con autenticazione, vai in Supabase:
-
-1. Authentication → Providers → Email → Enable
-2. Per ogni tabella: Authentication → RLS → Enable RLS
-
-### 4. Avviare sviluppo locale
 ```bash
 bun run dev
 ```
 
-Apri http://localhost:3000
+Open http://localhost:3000
 
-### 5. Build produzione
+### 5. Production build
+
 ```bash
 bun run build
 bun run preview
 ```
 
-## Deployment su Netlify
+## 🌐 Deploy to Netlify
 
-### 1. Preparare il repo
+### 1. Prepare the repository
+
 ```bash
 git add .
 git commit -m "Initial commit"
 git branch -M main
 ```
 
-### 2. Pushare su GitHub
+### 2. Push to GitHub
+
 ```bash
 git remote add origin https://github.com/your-username/my-gym.git
 git push -u origin main
 ```
 
-### 3. Connettere Netlify
-1. Vai su https://netlify.com
-2. Clicca "Add new site" → "Import an existing project"
-3. Seleziona GitHub e il repo `my-gym`
+### 3. Connect Netlify
+
+1. Go to https://netlify.com
+2. Click "Add new site" → "Import an existing project"
+3. Select GitHub and the `my-gym` repository
 4. Build settings:
    - Build command: `bun run build`
    - Publish directory: `.output/public`
@@ -146,107 +113,181 @@ git push -u origin main
    NUXT_PUBLIC_SUPABASE_URL=your-supabase-url
    NUXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
    ```
-6. Clicca "Deploy site"
+6. Click "Deploy site"
 
-Netlify farà automaticamente il deploy quando farai push su main!
+Netlify will automatically deploy when you push to main!
 
-## Struttura Progetto
+## 📁 Project Structure
 
 ```
 my-gym/
 ├── app/
 │   ├── pages/
-│   │   ├── index.vue              # Lista schede
-│   │   ├── schede/
-│   │   │   └── [id].vue           # Dettagli scheda + esercizi
-│   │   └── statistiche.vue        # Statistiche globali
-│   └── app.vue                    # Layout principale
-├── components/                    # Componenti riutilizzabili
+│   │   ├── login.vue              # Login/Signup page
+│   │   ├── index.vue              # Workout plans list
+│   │   ├── statistics.vue         # Detailed statistics & charts
+│   │   └── workout-plans/
+│   │       └── [id].vue           # Plan details + exercises
+│   └── app.vue                    # Main layout
+├── components/                    # Reusable components
 ├── composables/
-│   └── useSupabase.ts             # Configurazione Supabase
+│   ├── useSupabase.ts             # Supabase configuration
+│   └── useAuth.ts                 # Authentication helper
 ├── stores/
-│   └── workoutStore.ts            # Pinia store per schede/esercizi
+│   ├── authStore.ts               # Pinia auth store
+│   └── workoutStore.ts            # Pinia store for plans/exercises
+├── plugins/
+│   └── auth.ts                    # Auth plugin with route guards
 ├── assets/
 │   └── css/
 │       └── main.css               # Tailwind CSS
 ├── server/
-│   └── api/                       # Netlify Functions (opzionale)
-├── nuxt.config.ts                 # Configurazione Nuxt
-├── netlify.toml                   # Configurazione Netlify
-├── .env.example                   # Template variabili ambiente
-└── bun.lockb                       # Lock file Bun
+│   └── api/                       # API routes (optional)
+├── public/
+│   └── robots.txt                 # SEO
+├── nuxt.config.ts                 # Nuxt configuration
+├── tailwind.config.ts             # Tailwind configuration
+├── tsconfig.json                  # TypeScript configuration
+├── SUPABASE_COMPLETE_SETUP.md     # Detailed Supabase guide
+├── LICENSE                        # MIT License
+├── netlify.toml                   # Netlify configuration
+└── bun.lockb                       # Bun lock file
 ```
 
-## Uso dell'App
+## 📱 How to Use the App
 
-### 📋 Gestione Schede
-1. Clicca "Nuova Scheda" nella home
-2. Dagli un nome (es. "Upper Body")
-3. Aggiungi una descrizione opzionale
-4. Clicca "Crea"
+### 🔑 Authentication
 
-### 🏋️ Aggiungi Esercizi
-1. Dalla scheda, clicca "Aggiungi Esercizio"
-2. Compila:
-   - **Nome**: nome esercizio (es. Panca Piana)
-   - **Attrezzo**: attrezzo usato (es. Manubri)
-   - **Ripetizioni**: numero reps (es. 10)
-   - **Peso**: peso iniziale kg
-3. Clicca "Aggiungi"
+1. Visit http://localhost:3000/login
+2. **Sign Up**: Create a new account with email and password
+3. **Login**: Use your credentials to access the app
+4. **Logout**: Click the logout button in the header
 
-### ⚖️ Aggiorna Pesi
-1. Dalla scheda, clicca "Aggiorna Peso" su un esercizio
-2. Inserisci il nuovo peso
-3. Vedi il confronto (freccia up 📈 o down 📉)
-4. Clicca "Salva"
+### 📋 Manage Workout Plans
 
-### 📊 Statistiche
-1. Vai a "Statistiche" nel menu
-2. Seleziona una scheda
-3. Vedi:
-   - Numero esercizi
-   - Totale peso sollevato
-   - Incremento medio
-   - Progressione peso per singolo esercizio
-   - Cronologia aggiornamenti
+1. Click **"New Workout Plan"** on the home page
+2. Enter the plan name (e.g., "Upper Body", "Leg Day")
+3. Add an optional description
+4. Click **"Create Workout Plan"**
+5. Your plan now appears in the list
 
-## Troubleshooting
+### 🏋️ Add Exercises
 
-### Errore: "NUXT_PUBLIC_SUPABASE_URL not found"
-→ Verifica che `.env.local` esista e contenga le variabili corrette
+1. Click on a workout plan to open it
+2. Click **"Add Exercise"**
+3. Fill in the details:
+   - **Name**: Exercise name (e.g., Bench Press)
+   - **Equipment**: Type of equipment (e.g., Dumbbells)
+   - **Sets**: Number of sets (e.g., 3)
+   - **Reps**: Repetitions per set (e.g., 10)
+   - **Weight**: Starting weight in kg
+4. Click **"Add"**
 
-### Errore: "relations "schede" does not exist"
-→ Hai dimenticato di creare le tabelle SQL su Supabase. Segui il passo 3.4
+### ⚖️ Update Weight Progress
 
-### Build fallisce su Netlify
-→ Controlla i log di build in Netlify. Verifica che:
-- Environment variables siano presenti
-- Non ci siano typo nelle credenziali
-- Node >= 18 è in uso (Netlify usa Node 18 di default)
+1. From the plan, click **"Update Weight"** on an exercise
+2. Enter the new weight value
+3. Click **"Save"**
+4. The system automatically records the change
 
-## Migliorie Future
+### 📊 View Statistics
 
-- [ ] Autenticazione utenti con Supabase Auth
-- [ ] Condivisione schede tra utenti
-- [ ] Upload foto per esercizi
-- [ ] Reminder per allenamenti
-- [ ] API per mobile app
-- [ ] Grafico interattivo con Chart.js
-- [ ] Export/Import schede (CSV, JSON)
-- [ ] Workout in tempo reale con timer
+1. Click **"Statistics"** in the menu
+2. Select a workout plan
+3. See detailed metrics:
+   - Total exercises in the plan
+   - Total weight across all exercises
+   - Average weight trend
+   - Individual exercise weight progression charts
+   - Color-coded progress (green ↑ increase, orange ↓ decrease)
+   - Latest updates timeline
 
-## License
+## 🔒 Security & Privacy
 
-MIT - Libero da usare, modificare e distribuire
+- **User Isolation**: Each user only sees their own data (RLS enabled)
+- **Authentication**: Secure login with Supabase Auth
+- **No Data Sharing**: Your workouts are private
+- **Data Encryption**: All data is encrypted in transit and at rest
+- **Open Source**: MIT licensed, you can inspect the code
 
-## Support
+## 🐛 Troubleshooting
 
-Hai problemi? Controlla:
-1. La console del browser (F12)
-2. I log di Supabase nella dashboard
-3. La documentazione di Nuxt: https://nuxt.com
-4. La documentazione di Supabase: https://supabase.com/docs
+### Error: "NUXT_PUBLIC_SUPABASE_URL not found"
+
+→ Verify that `.env.local` exists in the project root with correct values
+
+### Error: "Email not confirmed"
+
+→ In Supabase, disable "Require email confirmation" under Authentication → Email (for development)
+
+### Error: "Invalid API key"
+
+→ Check that your Supabase URL and anon key are correct in `.env.local`
+
+### Build fails on Netlify
+
+→ Check build logs. Verify:
+
+- Environment variables are set in Netlify settings
+- No typos in credentials
+- Bun is available (Node 18+)
+
+### Data not appearing
+
+→ Check:
+
+1. Browser console (F12) for errors
+2. Supabase dashboard for data in tables
+3. Row Level Security policies are correctly configured
+
+**Full troubleshooting guide:** See [SUPABASE_COMPLETE_SETUP.md](./SUPABASE_COMPLETE_SETUP.md)
+
+## 🚀 Future Improvements
+
+- [ ] OAuth integration (Google, GitHub)
+- [ ] Password reset functionality
+- [ ] User profile with avatar
+- [ ] Share workout plans with other users
+- [ ] Workout reminders/notifications
+- [ ] Rest timer during workouts
+- [ ] Photo uploads for exercises
+- [ ] Mobile app (React Native)
+- [ ] Workout templates library
+- [ ] CSV/JSON export/import
+- [ ] Social features (leaderboards)
+- [ ] AI exercise recommendations
+
+## 📖 Documentation
+
+- [Complete Supabase Setup Guide](./SUPABASE_COMPLETE_SETUP.md) - Step-by-step database & auth configuration
+- [Nuxt Documentation](https://nuxt.com/docs) - Framework docs
+- [Supabase Documentation](https://supabase.com/docs) - Database & auth docs
+- [Tailwind CSS](https://tailwindcss.com/docs) - Styling framework
+
+## 📄 License
+
+MIT License - See [LICENSE](./LICENSE) file for details
+
+This means you can freely use, modify, and distribute this project for personal or commercial purposes.
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to:
+
+- Report issues
+- Submit pull requests
+- Suggest improvements
+- Share your feedback
+
+## 💬 Support
+
+Having issues? Check:
+
+1. Browser console (F12 → Console tab)
+2. Supabase dashboard logs
+3. [SUPABASE_COMPLETE_SETUP.md](./SUPABASE_COMPLETE_SETUP.md) troubleshooting section
+4. GitHub issues
 
 ---
 
-Made with 💪 and ☕
+Made with 💪 and ☕ for fitness enthusiasts
