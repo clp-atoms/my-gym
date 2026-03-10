@@ -2,6 +2,19 @@
   <div
     class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900"
   >
+    <!-- Auth Check Loading Overlay -->
+    <div
+      v-if="!authStore.authCheckComplete"
+      class="fixed inset-0 z-[9999] bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center"
+    >
+      <div class="flex flex-col items-center gap-3">
+        <div
+          class="w-8 h-8 border-3 border-emerald-200 dark:border-emerald-900 border-t-emerald-600 dark:border-t-emerald-400 rounded-full animate-spin"
+        ></div>
+        <p class="text-sm text-slate-600 dark:text-slate-400">Loading...</p>
+      </div>
+    </div>
+
     <!-- Header -->
     <header
       class="sticky top-0 z-50 backdrop-blur-md border-b border-slate-200/30 dark:border-slate-800/30 bg-white/80 dark:bg-slate-900/80 shadow-lg"
@@ -117,13 +130,6 @@ useHead({
     { rel: "apple-touch-icon", href: "/icons/icon-192x192.png" },
     { rel: "icon", type: "image/png", href: "/icons/icon-192x192.png" },
   ],
-});
-
-onMounted(async () => {
-  // Initialize authentication on app load
-  if (!authStore.user) {
-    await authStore.initializeAuth();
-  }
 });
 
 const handleLogout = async () => {

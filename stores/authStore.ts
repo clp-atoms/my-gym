@@ -5,6 +5,7 @@ interface AuthState {
   user: User | null;
   loading: boolean;
   error: string | null;
+  authCheckComplete: boolean;
 }
 
 export const useAuthStore = defineStore("auth", {
@@ -12,6 +13,7 @@ export const useAuthStore = defineStore("auth", {
     user: null,
     loading: false,
     error: null,
+    authCheckComplete: false,
   }),
 
   getters: {
@@ -31,6 +33,10 @@ export const useAuthStore = defineStore("auth", {
 
     setError(error: string | null) {
       this.error = error;
+    },
+
+    setAuthCheckComplete(value: boolean) {
+      this.authCheckComplete = value;
     },
 
     async signUp(email: string, password: string) {
