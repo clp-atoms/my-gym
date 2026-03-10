@@ -35,15 +35,13 @@
               <h3 class="font-semibold text-gray-900 dark:text-white">
                 {{
                   isUpdating
-                    ? "Aggiornamento in corso..."
-                    : "Nuovo aggiornamento disponibile"
+                    ? $t("pwa.updatingInProgress")
+                    : $t("pwa.updateAvailable")
                 }}
               </h3>
               <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {{
-                  isUpdating
-                    ? "Ricaricamento dell'app..."
-                    : "Una nuova versione di MyGym è disponibile. Aggiorna per avere le ultime funzioni."
+                  isUpdating ? $t("pwa.reloadingApp") : $t("pwa.updateMessage")
                 }}
               </p>
             </div>
@@ -53,7 +51,7 @@
               v-if="!isUpdating"
               @click="dismissUpdate"
               class="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              aria-label="Chiudi"
+              :aria-label="$t('pwa.close')"
             >
               <svg
                 class="w-5 h-5"
@@ -77,13 +75,13 @@
               @click="dismissUpdate"
               class="flex-1 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
             >
-              Dopo
+              {{ $t("pwa.later") }}
             </button>
             <button
               @click="applyUpdate"
               class="flex-1 px-3 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors"
             >
-              Aggiorna ora
+              {{ $t("pwa.updateNow") }}
             </button>
           </div>
 
@@ -102,9 +100,9 @@
       v-if="isDevelopment && !showUpdatePrompt"
       @click="testUpdate"
       class="fixed bottom-4 left-4 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-lg transition-colors z-40 font-medium"
-      title="Debug: Forza test aggiornamento PWA"
+      :title="$t('pwa.testDescription')"
     >
-      🧪 Test PWA Update
+      {{ $t("pwa.testButton") }}
     </button>
   </Teleport>
 </template>

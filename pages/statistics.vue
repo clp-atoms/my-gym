@@ -9,10 +9,10 @@
       ></div>
       <div class="relative z-10">
         <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
-          📊 Workout Statistics
+          {{ $t("pages.statistics.title") }}
         </h1>
         <p class="text-lg text-emerald-100">
-          Track your strength progression and celebrate your achievements
+          {{ $t("pages.statistics.subtitle") }}
         </p>
       </div>
       <!-- Decorative elements -->
@@ -35,7 +35,7 @@
         ></div>
       </div>
       <p class="text-slate-600 dark:text-slate-400 font-medium">
-        Loading statistics...
+        {{ $t("pages.statistics.loadingStatistics") }}
       </p>
     </div>
 
@@ -47,18 +47,17 @@
         <div class="text-6xl">📊</div>
       </div>
       <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-3">
-        No data available
+        {{ $t("pages.statistics.noDataTitle") }}
       </h3>
       <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
-        Create a workout plan and add exercises with their weight progress to
-        view your statistics
+        {{ $t("pages.statistics.noDataMessage") }}
       </p>
       <NuxtLink to="/">
         <UButton
           size="lg"
           class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white"
         >
-          Go to Workout Plans
+          {{ $t("pages.statistics.goToWorkoutPlans") }}
         </UButton>
       </NuxtLink>
     </div>
@@ -84,7 +83,7 @@
             </span>
             <p class="text-sm opacity-75 mt-1">
               {{ workoutStore.exercisesByWorkoutPlan(workoutPlan.id).length }}
-              exercises
+              {{ $t("pages.statistics.exercises") }}
             </p>
           </div>
           <div

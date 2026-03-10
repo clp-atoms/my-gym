@@ -1,0 +1,69 @@
+{
+  "common": {
+    "myGym": "MyGym",
+    "loading": "Loading...",
+    "back": "Back",
+    "logout": "Logout",
+    "copyright": "© 2026 MyGym - Gym Workout Tracker",
+    "builtWith": "Built with Nuxt 4 + Supabase",
+    "language": "Language"
+  },
+  "header": {
+    "workoutPlans": "Workout Plans",
+    "statistics": "Statistics",
+    "closeMenu": "Close menu",
+    "openMenu": "Open menu"
+  },
+  "auth": {
+    "myGym": "My Gym",
+    "trackFitness": "Track your fitness progress",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "emailPlaceholder": "you{'@'}example.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "confirmPassword": "Confirm Password",
+    "processing": "Processing...",
+    "createAccount": "Create Account",
+    "emailNotConfirmed": "Email not confirmed",
+    "confirmEmailSent": "We sent a confirmation email to",
+    "checkInbox": "Please check your inbox (and spam folder) and click the confirmation link to access your account.",
+    "resendConfirmationEmail": "Resend confirmation email",
+    "sending": "Sending..."
+  },
+  "pages": {
+    "index": {
+      "title": "My Workout Plans",
+      "subtitle": "Manage your workout plans and track your progress toward your goals",
+      "lastWorkoutPlan": "Last Workout Plan Opened:",
+      "newWorkoutPlan": "New Workout Plan"
+    },
+    "statistics": {
+      "title": "📊 Workout Statistics",
+      "subtitle": "Track your strength progression and celebrate your achievements",
+      "loadingStatistics": "Loading statistics...",
+      "noDataTitle": "No data available",
+      "noDataMessage": "Create a workout plan and add exercises with their weight progress to view your statistics",
+      "goToWorkoutPlans": "Go to Workout Plans",
+      "exercises": "exercises"
+    },
+    "workoutDetail": {
+      "addExercise": "Add Exercise",
+      "noExercises": "No exercises",
+      "addFirstExercise": "Add the first exercise to this workout plan",
+      "equipment": "Equipment"
+    }
+  },
+  "pwa": {
+    "updatingInProgress": "Aggiornamento in corso...",
+    "updateAvailable": "Nuovo aggiornamento disponibile",
+    "reloadingApp": "Ricaricamento dell'app...",
+    "updateMessage": "Una nuova versione di MyGym è disponibile. Aggiorna per avere le ultime funzioni.",
+    "later": "Later",
+    "updateNow": "Update Now",
+    "close": "Close",
+    "testButton": "🧪 Test PWA Update",
+    "testDescription": "Debug: Force PWA update test"
+  }
+}

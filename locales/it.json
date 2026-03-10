@@ -1,0 +1,69 @@
+{
+  "common": {
+    "myGym": "MyGym",
+    "loading": "Caricamento...",
+    "back": "Indietro",
+    "logout": "Esci",
+    "copyright": "© 2026 MyGym - Tracker Allenamenti in Palestra",
+    "builtWith": "Realizzato con Nuxt 4 + Supabase",
+    "language": "Lingua"
+  },
+  "header": {
+    "workoutPlans": "Piani di Allenamento",
+    "statistics": "Statistiche",
+    "closeMenu": "Chiudi menu",
+    "openMenu": "Apri menu"
+  },
+  "auth": {
+    "myGym": "My Gym",
+    "trackFitness": "Traccia i tuoi progressi fitness",
+    "login": "Accedi",
+    "signUp": "Registrati",
+    "email": "Email",
+    "emailPlaceholder": "tu{'@'}esempio.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "confirmPassword": "Conferma Password",
+    "processing": "Elaborazione in corso...",
+    "createAccount": "Crea Account",
+    "emailNotConfirmed": "Email non confermata",
+    "confirmEmailSent": "Abbiamo inviato un'email di conferma a",
+    "checkInbox": "Controlla la tua casella di posta (e la cartella spam) e fai clic sul link di conferma per accedere al tuo account.",
+    "resendConfirmationEmail": "Rinvia email di conferma",
+    "sending": "Invio in corso..."
+  },
+  "pages": {
+    "index": {
+      "title": "I Miei Piani di Allenamento",
+      "subtitle": "Gestisci i tuoi piani di allenamento e traccia i tuoi progressi verso i tuoi obiettivi",
+      "lastWorkoutPlan": "Ultimo Piano di Allenamento Aperto:",
+      "newWorkoutPlan": "Nuovo Piano di Allenamento"
+    },
+    "statistics": {
+      "title": "📊 Statistiche Allenamenti",
+      "subtitle": "Traccia la progressione della tua forza e celebra i tuoi successi",
+      "loadingStatistics": "Caricamento statistiche...",
+      "noDataTitle": "Nessun dato disponibile",
+      "noDataMessage": "Crea un piano di allenamento e aggiungi esercizi con la loro progressione di peso per visualizzare le tue statistiche",
+      "goToWorkoutPlans": "Vai ai Piani di Allenamento",
+      "exercises": "esercizi"
+    },
+    "workoutDetail": {
+      "addExercise": "Aggiungi Esercizio",
+      "noExercises": "Nessun esercizio",
+      "addFirstExercise": "Aggiungi il primo esercizio a questo piano di allenamento",
+      "equipment": "Attrezzatura"
+    }
+  },
+  "pwa": {
+    "updatingInProgress": "Aggiornamento in corso...",
+    "updateAvailable": "Nuovo aggiornamento disponibile",
+    "reloadingApp": "Ricaricamento dell'app...",
+    "updateMessage": "Una nuova versione di MyGym è disponibile. Aggiorna per avere le ultime funzioni.",
+    "later": "Dopo",
+    "updateNow": "Aggiorna ora",
+    "close": "Chiudi",
+    "testButton": "🧪 Test Aggiornamento PWA",
+    "testDescription": "Debug: Forza test aggiornamento PWA"
+  }
+}

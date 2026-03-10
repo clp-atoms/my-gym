@@ -9,10 +9,10 @@
       ></div>
       <div class="relative z-10">
         <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
-          My Workout Plans
+          {{ $t("pages.index.title") }}
         </h1>
         <p class="text-lg text-blue-100 max-w-2xl mb-8">
-          Manage your workout plans and track your progress toward your goals
+          {{ $t("pages.index.subtitle") }}
         </p>
 
         <!-- Continua da ultima scheda -->
@@ -21,7 +21,9 @@
             <div
               class="inline-block bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 hover:bg-white/30 transition-all cursor-pointer"
             >
-              <p class="text-sm text-blue-50 mb-1">Last Workout Plan Opened:</p>
+              <p class="text-sm text-blue-50 mb-1">
+                {{ $t("pages.index.lastWorkoutPlan") }}
+              </p>
               <p class="text-lg font-semibold text-white">
                 {{ lastWorkoutPlan.name }}
               </p>
@@ -35,7 +37,7 @@
           class="bg-white text-blue-600 hover:bg-blue-50"
           @click="isModalOpen = true"
         >
-          New Workout Plan
+          {{ $t("pages.index.newWorkoutPlan") }}
         </UButton>
       </div>
       <!-- Decorative elements -->

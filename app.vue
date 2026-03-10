@@ -12,7 +12,9 @@
           <div
             class="w-8 h-8 border-3 border-emerald-200 dark:border-emerald-900 border-t-emerald-600 dark:border-t-emerald-400 rounded-full animate-spin"
           ></div>
-          <p class="text-sm text-slate-600 dark:text-slate-400">Loading...</p>
+          <p class="text-sm text-slate-600 dark:text-slate-400">
+            {{ $t("common.loading") }}
+          </p>
         </div>
       </div>
     </ClientOnly>
@@ -35,7 +37,7 @@
             </div>
             <span
               class="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text"
-              >MyGym</span
+              >{{ $t("common.myGym") }}</span
             >
           </NuxtLink>
 
@@ -44,13 +46,13 @@
               to="/"
               class="relative text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-blue-600 after:to-purple-600 hover:after:w-full after:transition-all after:duration-300"
             >
-              Workout Plans
+              {{ $t("header.workoutPlans") }}
             </NuxtLink>
             <NuxtLink
               to="/statistics"
               class="relative text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-blue-600 after:to-purple-600 hover:after:w-full after:transition-all after:duration-300"
             >
-              Statistics
+              {{ $t("header.statistics") }}
             </NuxtLink>
           </nav>
 
@@ -65,7 +67,9 @@
             <button
               @click="isMenuOpen = !isMenuOpen"
               class="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              :aria-label="isMenuOpen ? 'Close menu' : 'Open menu'"
+              :aria-label="
+                isMenuOpen ? $t('header.closeMenu') : $t('header.openMenu')
+              "
             >
               <svg
                 v-if="!isMenuOpen"
@@ -100,7 +104,7 @@
               @click="handleLogout"
               class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors font-medium text-sm"
             >
-              Logout
+              {{ $t("common.logout") }}
             </button>
           </div>
         </div>
@@ -123,14 +127,14 @@
               class="block px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition-colors"
               @click="closeMenu"
             >
-              💪 Workout Plans
+              💪 {{ $t("header.workoutPlans") }}
             </NuxtLink>
             <NuxtLink
               to="/statistics"
               class="block px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition-colors"
               @click="closeMenu"
             >
-              📊 Statistics
+              📊 {{ $t("header.statistics") }}
             </NuxtLink>
           </nav>
         </transition>
@@ -160,13 +164,34 @@
     <footer
       class="border-t border-slate-200/30 dark:border-slate-800/30 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm mt-16"
     >
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-        <p class="text-slate-600 dark:text-slate-400">
-          &copy; 2026 MyGym - Gym Workout Tracker
-        </p>
-        <p class="text-sm text-slate-500 dark:text-slate-500 mt-2">
-          Built with Nuxt 4 + Supabase
-        </p>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="text-center mb-6">
+          <p class="text-slate-600 dark:text-slate-400">
+            {{ $t("common.copyright") }}
+          </p>
+          <p class="text-sm text-slate-500 dark:text-slate-500 mt-2">
+            {{ $t("common.builtWith") }}
+          </p>
+        </div>
+
+        <!-- Language Selector -->
+        <div class="flex justify-center items-center gap-2">
+          <label
+            for="language-select"
+            class="text-sm text-slate-600 dark:text-slate-400 font-medium"
+          >
+            {{ $t("common.language") }}
+          </label>
+          <select
+            id="language-select"
+            :value="$i18n.locale"
+            @change="switchLanguage"
+            class="px-3 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 transition-colors text-sm font-medium cursor-pointer"
+          >
+            <option value="en">English</option>
+            <option value="it">Italiano</option>
+          </select>
+        </div>
       </div>
     </footer>
 
@@ -181,6 +206,7 @@ import { ref } from "vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
+const i18n = useI18n();
 const isMenuOpen = ref(false);
 
 // PWA Meta Tags
@@ -215,5 +241,10 @@ const handleLogout = async () => {
 
 const closeMenu = () => {
   isMenuOpen.value = false;
+};
+
+const switchLanguage = (event: Event) => {
+  const target = event.target as HTMLSelectElement;
+  i18n.setLocale(target.value);
 };
 </script>

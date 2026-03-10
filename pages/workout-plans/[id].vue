@@ -8,7 +8,7 @@
           color="gray"
           variant="ghost"
         >
-          Back
+          {{ $t("common.back") }}
         </UButton>
       </NuxtLink>
       <div>
@@ -26,7 +26,9 @@
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center h-64">
-      <div class="text-slate-600 dark:text-slate-400">Loading...</div>
+      <div class="text-slate-600 dark:text-slate-400">
+        {{ $t("common.loading") }}
+      </div>
     </div>
 
     <!-- Content -->
@@ -37,7 +39,7 @@
         size="lg"
         @click="isModalExerciseOpen = true"
       >
-        Add Exercise
+        {{ $t("pages.workoutDetail.addExercise") }}
       </UButton>
 
       <!-- Empty State -->
@@ -47,10 +49,10 @@
       >
         <div class="text-6xl mb-4">🏋️</div>
         <h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-          No exercises
+          {{ $t("pages.workoutDetail.noExercises") }}
         </h3>
         <p class="text-slate-600 dark:text-slate-400 mb-6">
-          Add the first exercise to this workout plan
+          {{ $t("pages.workoutDetail.addFirstExercise") }}
         </p>
       </div>
 
