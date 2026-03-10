@@ -23,7 +23,11 @@
       >
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-16">
-            <NuxtLink to="/" class="flex items-center gap-2 group">
+            <NuxtLink
+              to="/"
+              class="flex items-center gap-2 group"
+              @click="closeMenu"
+            >
               <div
                 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text group-hover:from-purple-600 group-hover:to-blue-600 transition-all duration-300 transform group-hover:scale-110"
               >
@@ -50,7 +54,7 @@
               </NuxtLink>
             </nav>
 
-            <!-- User Menu -->
+            <!-- User Menu & Mobile Toggle -->
             <div
               v-if="authStore.isAuthenticated"
               class="flex items-center gap-4"
@@ -60,6 +64,41 @@
                   {{ authStore.userEmail }}
                 </p>
               </div>
+              <!-- Mobile Menu Toggle -->
+              <button
+                @click="isMenuOpen = !isMenuOpen"
+                class="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                :aria-label="isMenuOpen ? 'Close menu' : 'Open menu'"
+              >
+                <svg
+                  v-if="!isMenuOpen"
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+                <svg
+                  v-else
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
               <button
                 @click="handleLogout"
                 class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors font-medium text-sm"
@@ -68,6 +107,36 @@
               </button>
             </div>
           </div>
+
+          <!-- Mobile Menu -->
+          <transition
+            enter-active-class="transition duration-200"
+            leave-active-class="transition duration-200"
+            enter-from-class="opacity-0 -translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-2"
+          >
+            <nav
+              v-show="isMenuOpen"
+              class="md:hidden border-t border-slate-200/30 dark:border-slate-800/30 py-4 space-y-2"
+            >
+              <NuxtLink
+                to="/"
+                class="block px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition-colors"
+                @click="closeMenu"
+              >
+                💪 Workout Plans
+              </NuxtLink>
+              <NuxtLink
+                to="/statistics"
+                class="block px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-medium transition-colors"
+                @click="closeMenu"
+              >
+                📊 Statistics
+              </NuxtLink>
+            </nav>
+          </transition>
         </div>
       </header>
 
@@ -109,9 +178,11 @@
 
 <script setup lang="ts">
 import "~/assets/css/main.css";
+import { ref } from "vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
+const isMenuOpen = ref(false);
 
 // PWA Meta Tags
 useHead({
@@ -141,5 +212,9 @@ useHead({
 const handleLogout = async () => {
   await authStore.signOut();
   await router.push("/login");
+};
+
+const closeMenu = () => {
+  isMenuOpen.value = false;
 };
 </script>
