@@ -506,13 +506,13 @@
     <!-- Modal Update Weight -->
     <UModal v-model:open="isModalUpdateOpen">
       <template #header>
-        <h2 class="text-lg font-semibold">
+        <h2 v-if="selectedExercise" class="text-lg font-semibold">
           Update Weight - {{ selectedExercise.name }}
         </h2>
       </template>
 
       <template #body>
-        <div class="space-y-4 flex-1 overflow-y-auto">
+        <div v-if="selectedExercise" class="space-y-4 flex-1 overflow-y-auto">
           <div>
             <label
               class="block text-sm font-medium text-slate-900 dark:text-white mb-2"
@@ -648,15 +648,51 @@ const exercises = computed(() => {
 onMounted(async () => {
   loading.value = true;
   try {
+    // Load workout plans if store is empty
+    if (workoutStore.workoutPlans.length === 0) {
+      const { data: plansData, error: plansError } = await supabase
+        .from("workout_plans")
+        .select("*");
+
+      if (plansError) throw plansError;
+
+      const mappedPlans = (plansData || []).map((plan: any) => ({
+        id: plan.id,
+        name: plan.name || plan.nome,
+        description: plan.description || plan.descrizione,
+        created_at: plan.created_at,
+        exercises: plan.exercises,
+      }));
+
+      workoutStore.setWorkoutPlans(mappedPlans);
+    }
+
     const { data, error } = await supabase
       .from("exercises")
       .select("*")
       .eq("workout_plan_id", workoutPlanId);
 
     if (error) throw error;
+
+    // Map Italian field names to English
+    const mappedExercises = (data || []).map((ex: any) => ({
+      id: ex.id,
+      workout_plan_id: ex.workout_plan_id,
+      name: ex.name || ex.nome,
+      equipment: ex.equipment || ex.attrezzo,
+      description: ex.description || ex.descrizione,
+      sets: Number(ex.sets || ex.serie || 0),
+      reps: Number(ex.reps || ex.ripetizioni || 0),
+      current_weight: Number(ex.current_weight || ex.peso_attuale || 0),
+      rest_time: Number(ex.rest_time || ex.recupero || 0),
+      duration: Number(ex.duration || ex.tempo || 0),
+    }));
+
     workoutStore.setExercises([
-      ...workoutStore.exercises.filter((e) => e.workout_plan_id !== workoutPlanId),
-      ...(data || []),
+      ...workoutStore.exercises.filter(
+        (e) => e.workout_plan_id !== workoutPlanId,
+      ),
+      ...mappedExercises,
     ]);
 
     const { data: weightHistory, error: weightHistoryError } = await supabase
@@ -664,7 +700,16 @@ onMounted(async () => {
       .select("*");
 
     if (weightHistoryError) throw weightHistoryError;
-    workoutStore.setWeightHistory(weightHistory || []);
+
+    // Map Italian field names to English for weight_history
+    const mappedWeightHistory = (weightHistory || []).map((w: any) => ({
+      id: w.id,
+      exercise_id: w.exercise_id,
+      weight: Number(w.weight || w.peso || 0),
+      date: w.date || w.data,
+    }));
+
+    workoutStore.setWeightHistory(mappedWeightHistory);
 
     // Register this workout plan as the last one executed
     workoutStore.setLastWorkoutPlanId(workoutPlanId);
@@ -757,6 +802,14 @@ const saveExerciseChanges = async () => {
 
   updatingExercise.value = true;
   try {
+    // Get the original exercise to detect weight changes
+    const originalExercise = workoutStore.exercises.find(
+      (e) => e.id === editingExercise.value.id,
+    );
+    const weightChanged =
+      originalExercise &&
+      originalExercise.current_weight !== editingExercise.value.current_weight;
+
     const { error } = await supabase
       .from("exercises")
       .update({
@@ -772,6 +825,21 @@ const saveExerciseChanges = async () => {
       .eq("id", editingExercise.value.id);
 
     if (error) throw error;
+
+    // If weight changed, add to weight history
+    if (weightChanged) {
+      const { error: historyError } = await supabase
+        .from("weight_history")
+        .insert([
+          {
+            exercise_id: editingExercise.value.id,
+            weight: editingExercise.value.current_weight || 0,
+            date: new Date().toISOString(),
+          },
+        ]);
+
+      if (historyError) throw historyError;
+    }
 
     // Update store
     const exerciseIndex = workoutStore.exercises.findIndex(

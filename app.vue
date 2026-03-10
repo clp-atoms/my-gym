@@ -25,13 +25,13 @@
               to="/"
               class="relative text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-blue-600 after:to-purple-600 hover:after:w-full after:transition-all after:duration-300"
             >
-              Schede
+              Workout Plans
             </NuxtLink>
             <NuxtLink
-              to="/statistiche"
+              to="/statistics"
               class="relative text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-blue-600 after:to-purple-600 hover:after:w-full after:transition-all after:duration-300"
             >
-              Statistiche
+              Statistics
             </NuxtLink>
           </nav>
         </div>

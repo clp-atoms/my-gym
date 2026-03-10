@@ -21,7 +21,7 @@
             <div
               class="inline-block bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-3 hover:bg-white/30 transition-all cursor-pointer"
             >
-              <p class="text-sm text-blue-50 mb-1">Continue from:</p>
+              <p class="text-sm text-blue-50 mb-1">Last Workout Plan Opened:</p>
               <p class="text-lg font-semibold text-white">
                 {{ lastWorkoutPlan.name }}
               </p>
@@ -114,7 +114,7 @@
                 {{ workoutPlan.name }}
               </h3>
               <p
-                v-if="scheda.description"
+                v-if="workoutPlan.description"
                 class="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2"
               >
                 {{ workoutPlan.description }}
@@ -195,9 +195,9 @@
               Workout Plan Name
             </label>
             <input
-              v-model="newScheda.name"
+              v-model="newWorkoutPlan.name"
               type="text"
-              placeholder="es. Upper Body"
+              placeholder="e.g. Upper Body"
               class="w-full px-4 py-3 border-2 border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition"
             />
           </div>
@@ -260,9 +260,6 @@ const lastWorkoutPlan = computed(() => workoutStore.lastWorkoutPlan);
 onMounted(async () => {
   loading.value = true;
   try {
-    // Carica l'ultima scheda eseguita dal localStorage
-    workoutStore.loadLastWorkoutPlanId();
-
     const { data, error } = await supabase
       .from("workout_plans")
       .select("*")
@@ -270,7 +267,19 @@ onMounted(async () => {
 
     if (error) throw error;
 
-    workoutStore.setWorkoutPlans(data || []);
+    // Map Italian field names to English
+    const mappedPlans = (data || []).map((plan: any) => ({
+      id: plan.id,
+      name: plan.name || plan.nome,
+      description: plan.description || plan.descrizione,
+      created_at: plan.created_at,
+      exercises: plan.exercises,
+    }));
+
+    workoutStore.setWorkoutPlans(mappedPlans);
+
+    // Load the last workout plan executed from localStorage (after plans are loaded)
+    workoutStore.loadLastWorkoutPlanId();
 
     // Load all exercises
     const { data: exercises, error: exercisesError } = await supabase
@@ -279,7 +288,21 @@ onMounted(async () => {
 
     if (exercisesError) throw exercisesError;
 
-    workoutStore.setExercises(exercises || []);
+    // Map Italian field names to English
+    const mappedExercises = (exercises || []).map((ex: any) => ({
+      id: ex.id,
+      workout_plan_id: ex.workout_plan_id,
+      name: ex.name || ex.nome,
+      equipment: ex.equipment || ex.attrezzo,
+      description: ex.description || ex.descrizione,
+      sets: Number(ex.sets || ex.serie || 0),
+      reps: Number(ex.reps || ex.ripetizioni || 0),
+      current_weight: Number(ex.current_weight || ex.peso_attuale || 0),
+      rest_time: Number(ex.rest_time || ex.recupero || 0),
+      duration: Number(ex.duration || ex.tempo || 0),
+    }));
+
+    workoutStore.setExercises(mappedExercises);
   } catch (error) {
     console.error("Error loading workout plans:", error);
   } finally {
@@ -321,7 +344,9 @@ const createWorkoutPlan = async () => {
 };
 
 const confirmDelete = async (workoutPlanId: string) => {
-  const confirmed = confirm("Are you sure you want to delete this workout plan?");
+  const confirmed = confirm(
+    "Are you sure you want to delete this workout plan?",
+  );
   if (!confirmed) return;
 
   try {
@@ -332,7 +357,10 @@ const confirmDelete = async (workoutPlanId: string) => {
 
     if (deleteExercisesError) throw deleteExercisesError;
 
-    const { error } = await supabase.from("workout_plans").delete().eq("id", workoutPlanId);
+    const { error } = await supabase
+      .from("workout_plans")
+      .delete()
+      .eq("id", workoutPlanId);
 
     if (error) throw error;
 

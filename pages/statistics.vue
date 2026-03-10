@@ -50,7 +50,8 @@
         No data available
       </h3>
       <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
-        Create a workout plan and add exercises with their weight progress to view your statistics
+        Create a workout plan and add exercises with their weight progress to
+        view your statistics
       </p>
       <NuxtLink to="/">
         <UButton
@@ -78,9 +79,12 @@
           ]"
         >
           <div class="relative z-10">
-            <span class="flex items-center gap-2"> 💪 {{ workoutPlan.name }} </span>
+            <span class="flex items-center gap-2">
+              💪 {{ workoutPlan.name }}
+            </span>
             <p class="text-sm opacity-75 mt-1">
-              {{ workoutStore.exercisesByWorkoutPlan(workoutPlan.id).length }} exercises
+              {{ workoutStore.exercisesByWorkoutPlan(workoutPlan.id).length }}
+              exercises
             </p>
           </div>
           <div
@@ -91,7 +95,10 @@
       </div>
 
       <!-- Selected Workout Plan Statistics -->
-      <div v-if="selectedWorkoutPlan && exerciseStats.length > 0" class="space-y-8">
+      <div
+        v-if="selectedWorkoutPlan && exerciseStats.length > 0"
+        class="space-y-8"
+      >
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="relative group">
@@ -262,7 +269,18 @@
                           height: `${(record.weight / Math.max(...exStat.history.map((r) => r.weight))) * 100}%`,
                           minHeight: '8px',
                         }"
-                        class="w-full bg-gradient-to-t from-emerald-500 to-teal-400 dark:from-emerald-600 dark:to-teal-500 rounded-t-lg hover:from-emerald-600 hover:to-teal-500 transition-all cursor-help transform hover:scale-105"
+                        :class="[
+                          'w-full rounded-t-lg transition-all cursor-help transform hover:scale-105',
+                          barIdx === 0
+                            ? 'bg-gradient-to-t from-slate-500 to-slate-400 dark:from-slate-600 dark:to-slate-500 hover:from-slate-600 hover:to-slate-500'
+                            : exStat.history.slice(-6)[barIdx - 1].weight <
+                                record.weight
+                              ? 'bg-gradient-to-t from-emerald-500 to-teal-400 dark:from-emerald-600 dark:to-teal-500 hover:from-emerald-600 hover:to-teal-500'
+                              : exStat.history.slice(-6)[barIdx - 1].weight >
+                                  record.weight
+                                ? 'bg-gradient-to-t from-orange-500 to-orange-400 dark:from-orange-600 dark:to-orange-500 hover:from-orange-600 hover:to-orange-500'
+                                : 'bg-gradient-to-t from-slate-500 to-slate-400 dark:from-slate-600 dark:to-slate-500 hover:from-slate-600 hover:to-slate-500',
+                        ]"
                         :title="`${record.weight}kg - ${new Date(record.date).toLocaleDateString('en-US')}`"
                       />
                       <p
@@ -403,7 +421,8 @@
                       </span>
                       <span
                         class="font-bold text-slate-900 dark:text-white text-lg"
-                        >{{ record.weight }} <span class="text-sm">kg</span></span
+                        >{{ record.weight }}
+                        <span class="text-sm">kg</span></span
                       >
                     </div>
                   </div>
@@ -425,7 +444,8 @@
           {{ selectedWorkoutPlan.name }} - No data
         </h3>
         <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
-          Add exercises to this workout plan to view statistics and track your progress
+          Add exercises to this workout plan to view statistics and track your
+          progress
         </p>
         <NuxtLink :to="`/workout-plans/${selectedWorkoutPlan.id}`">
           <UButton
@@ -461,6 +481,12 @@ const exerciseStats = computed(() => {
 
   return workoutStore
     .exercisesByWorkoutPlan(selectedWorkoutPlanId.value)
+    .sort((a, b) => {
+      return a.name.localeCompare(b.name, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
+    })
     .map((exercise) => {
       const history = workoutStore.historyByExercise(exercise.id);
       const initialWeight =
@@ -499,10 +525,20 @@ onMounted(async () => {
       .order("created_at", { ascending: false });
 
     if (workoutPlansError) throw workoutPlansError;
-    workoutStore.setWorkoutPlans(workoutPlansData || []);
 
-    if (workoutPlansData && workoutPlansData.length > 0) {
-      selectedWorkoutPlanId.value = workoutPlansData[0].id;
+    // Map Italian field names to English
+    const mappedPlans = (workoutPlansData || []).map((plan: any) => ({
+      id: plan.id,
+      name: plan.name || plan.nome,
+      description: plan.description || plan.descrizione,
+      created_at: plan.created_at,
+      exercises: plan.exercises,
+    }));
+
+    workoutStore.setWorkoutPlans(mappedPlans);
+
+    if (mappedPlans && mappedPlans.length > 0) {
+      selectedWorkoutPlanId.value = mappedPlans[0].id;
     }
 
     const { data: exercisesData, error: exercisesError } = await supabase
@@ -510,15 +546,40 @@ onMounted(async () => {
       .select("*");
 
     if (exercisesError) throw exercisesError;
-    workoutStore.setExercises(exercisesData || []);
 
-    const { data: weightHistoryData, error: weightHistoryError } = await supabase
-      .from("weight_history")
-      .select("*")
-      .order("date", { ascending: true });
+    // Map Italian field names to English
+    const mappedExercises = (exercisesData || []).map((ex: any) => ({
+      id: ex.id,
+      workout_plan_id: ex.workout_plan_id,
+      name: ex.name || ex.nome,
+      equipment: ex.equipment || ex.attrezzo,
+      description: ex.description || ex.descrizione,
+      sets: Number(ex.sets || ex.serie || 0),
+      reps: Number(ex.reps || ex.ripetizioni || 0),
+      current_weight: Number(ex.current_weight || ex.peso_attuale || 0),
+      rest_time: Number(ex.rest_time || ex.recupero || 0),
+      duration: Number(ex.duration || ex.tempo || 0),
+    }));
+
+    workoutStore.setExercises(mappedExercises);
+
+    const { data: weightHistoryData, error: weightHistoryError } =
+      await supabase
+        .from("weight_history")
+        .select("*")
+        .order("date", { ascending: true });
 
     if (weightHistoryError) throw weightHistoryError;
-    workoutStore.setWeightHistory(weightHistoryData || []);
+
+    // Map Italian field names to English
+    const mappedWeightHistory = (weightHistoryData || []).map((w: any) => ({
+      id: w.id,
+      exercise_id: w.exercise_id,
+      weight: Number(w.weight || w.peso || 0),
+      date: w.date || w.data,
+    }));
+
+    workoutStore.setWeightHistory(mappedWeightHistory);
   } catch (error) {
     console.error("Error loading statistics:", error);
   } finally {

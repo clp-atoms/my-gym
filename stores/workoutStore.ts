@@ -44,8 +44,14 @@ export const useWorkoutStore = defineStore("workout", {
     },
 
     lastWorkoutPlan: (state) => {
-      if (!state.lastWorkoutPlanId) return null;
-      return state.workoutPlans.find((s) => s.id === state.lastWorkoutPlanId);
+      if (state.lastWorkoutPlanId) {
+        const found = state.workoutPlans.find(
+          (s) => s.id === state.lastWorkoutPlanId,
+        );
+        if (found) return found;
+      }
+      // Fallback: return the first workout plan if lastWorkoutPlanId is not set or not found
+      return state.workoutPlans.length > 0 ? state.workoutPlans[0] : null;
     },
 
     exercisesByWorkoutPlan: (state) => (workoutPlanId: string) => {
@@ -117,8 +123,12 @@ export const useWorkoutStore = defineStore("workout", {
     },
 
     deleteWorkoutPlan(workoutPlanId: string) {
-      this.workoutPlans = this.workoutPlans.filter((s) => s.id !== workoutPlanId);
-      this.exercises = this.exercises.filter((e) => e.workout_plan_id !== workoutPlanId);
+      this.workoutPlans = this.workoutPlans.filter(
+        (s) => s.id !== workoutPlanId,
+      );
+      this.exercises = this.exercises.filter(
+        (e) => e.workout_plan_id !== workoutPlanId,
+      );
     },
 
     deleteExercise(exerciseId: string) {
