@@ -143,15 +143,13 @@ export const useWorkoutStore = defineStore("workout", {
         const authStore = useAuthStore();
 
         if (authStore.userId) {
-          const { error } = await supabase
-            .from("user_preferences")
-            .upsert(
-              {
-                user_id: authStore.userId,
-                last_workout_plan_id: workoutPlanId,
-              },
-              { onConflict: "user_id" },
-            );
+          const { error } = await supabase.from("user_preferences").upsert(
+            {
+              user_id: authStore.userId,
+              last_workout_plan_id: workoutPlanId,
+            },
+            { onConflict: "user_id" },
+          );
 
           if (error) {
             console.error("Error saving last workout plan to DB:", error);
@@ -167,24 +165,37 @@ export const useWorkoutStore = defineStore("workout", {
         const { supabase } = useSupabase();
         const authStore = useAuthStore();
 
-        if (authStore.userId) {
-          const { data, error } = await supabase
-            .from("user_preferences")
-            .select("last_workout_plan_id")
-            .eq("user_id", authStore.userId)
-            .single();
+        // Ensure user is authenticated and session is ready
+        if (!authStore.userId) {
+          console.debug("User not authenticated yet, skipping load");
+          return;
+        }
 
-          if (error) {
-            // If no preference found, that's OK (first time user)
-            if (error.code !== "PGRST116") {
-              console.error("Error loading last workout plan from DB:", error);
-            }
-            return;
-          }
+        // Verify session exists
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          console.debug("No active session, skipping load");
+          return;
+        }
 
-          if (data?.last_workout_plan_id) {
-            this.lastWorkoutPlanId = data.last_workout_plan_id;
+        const { data, error } = await supabase
+          .from("user_preferences")
+          .select("last_workout_plan_id")
+          .eq("user_id", authStore.userId)
+          .single();
+
+        if (error) {
+          // If no preference found, that's OK (first time user)
+          if (error.code !== "PGRST116") {
+            console.error("Error loading last workout plan from DB:", error);
           }
+          return;
+        }
+
+        if (data?.last_workout_plan_id) {
+          this.lastWorkoutPlanId = data.last_workout_plan_id;
         }
       } catch (error) {
         console.error("Error in loadLastWorkoutPlanId:", error);
