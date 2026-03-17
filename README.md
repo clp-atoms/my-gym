@@ -10,7 +10,9 @@ A modern web app to manage gym workout plans with **Nuxt 4**, **Vue 3**, and **S
 - ✅ **Visual Charts** - Color-coded progress charts with green ↑ (improvement) and orange ↓ (decrease)
 - ✅ **Detailed Statistics Dashboard** - Per-plan insights with KPI cards and metrics grid
 - ✅ **Automatic History Tracking** - Records all metrics every time you create or modify an exercise
-- ✅ **User Authentication** - Secure login with Supabase Auth
+- ✅ **User Authentication** - Secure login/signup with Supabase Auth
+- ✅ **Password Reset** - Email-based password recovery with dedicated reset page
+- ✅ **Protected Routes** - Automatic authentication middleware on all protected pages
 - ✅ **Data Isolation** - Each user sees only their own data (RLS enabled)
 - ✅ **Cross-Device Sync** - Last opened workout plan synced across devices/browsers via Supabase
 - ✅ **Responsive Design** - Mobile, tablet, and desktop optimized
@@ -126,12 +128,15 @@ Netlify will automatically deploy when you push to main!
 my-gym/
 ├── app/
 │   ├── pages/
-│   │   ├── login.vue              # Login/Signup page
-│   │   ├── index.vue              # Workout plans list
-│   │   ├── statistics.vue         # Detailed statistics & charts
+│   │   ├── login.vue              # Login/Signup/Password Reset page
+│   │   ├── reset-password.vue     # Password reset form with token validation
+│   │   ├── index.vue              # Workout plans list (protected)
+│   │   ├── statistics.vue         # Detailed statistics & charts (protected)
 │   │   └── workout-plans/
-│   │       └── [id].vue           # Plan details + exercises
-│   └── app.vue                    # Main layout
+│   │       └── [id].vue           # Plan details + exercises (protected)
+│   └── app.vue                    # Main layout with auth overlay
+├── middleware/
+│   └── auth.ts                    # Route protection middleware
 ├── components/                    # Reusable components
 ├── composables/
 │   ├── useSupabase.ts             # Supabase configuration
@@ -140,7 +145,7 @@ my-gym/
 │   ├── authStore.ts               # Pinia auth store
 │   └── workoutStore.ts            # Pinia store for plans/exercises
 ├── plugins/
-│   └── auth.ts                    # Auth plugin with route guards
+│   └── auth.ts                    # Auth plugin with recovery handling
 ├── assets/
 │   └── css/
 │       └── main.css               # Tailwind CSS
@@ -164,7 +169,17 @@ my-gym/
 1. Visit http://localhost:3000/login
 2. **Sign Up**: Create a new account with email and password
 3. **Login**: Use your credentials to access the app
-4. **Logout**: Click the logout button in the header
+4. **Password Reset**:
+   - Click "Forgot your password?" on the login form
+   - Enter your email and click "Send Reset Link"
+   - Check your email for the reset link
+   - Click the link to open the password reset page
+   - Enter your new password and confirm
+   - Click "Update Password"
+   - You'll be redirected to login with your new credentials
+5. **Logout**: Click the logout button in the header
+6. **Protected Pages**: All pages except login and password reset require authentication
+   - Non-authenticated users are automatically redirected to login
 
 ### 📋 Manage Workout Plans
 
@@ -248,8 +263,7 @@ my-gym/
 ## 🚀 Future Improvements
 
 - [ ] OAuth integration (Google, GitHub)
-- [ ] Password reset functionality
-- [ ] User profile with avatar
+- [ ] User profile with avatar and settings
 - [ ] Share workout plans with other users
 - [ ] Workout reminders/notifications
 - [ ] Rest timer during workouts
@@ -259,6 +273,7 @@ my-gym/
 - [ ] CSV/JSON export/import
 - [ ] Social features (leaderboards)
 - [ ] AI exercise recommendations
+- [ ] Two-factor authentication (2FA)
 
 ## 📖 Documentation
 

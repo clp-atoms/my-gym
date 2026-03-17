@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const authStore = useAuthStore();
-  const publicRoutes = ["/login"];
+  const publicRoutes = ["/login", "/reset-password"];
 
   // Se l'utente sta cercando di accedere a una rotta pubblica, lascialo andare
   // (il check dell'autenticazione non è urgente)
