@@ -139,21 +139,19 @@
 
     <!-- Background Animated Elements -->
     <div
-      class="fixed top-0 left-0 w-96 h-96 bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-3xl -z-10 animate-blob"
+      class="fixed top-0 left-0 w-96 h-96 bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-3xl -z-10"
       style="animation: float 8s ease-in-out infinite"
     ></div>
     <div
-      class="fixed bottom-0 right-0 w-96 h-96 bg-purple-400/20 dark:bg-purple-600/20 rounded-full blur-3xl -z-10 animate-blob animation-delay-2000"
+      class="fixed bottom-0 right-0 w-96 h-96 bg-purple-400/20 dark:bg-purple-600/20 rounded-full blur-3xl -z-10"
       style="animation: float 8s ease-in-out infinite 2s"
     ></div>
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="animate-fade-in">
-        <UApp>
-          <NuxtPage />
-        </UApp>
-      </div>
+      <UApp>
+        <NuxtPage />
+      </UApp>
     </main>
 
     <!-- Footer -->
