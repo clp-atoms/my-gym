@@ -604,6 +604,10 @@
 <script setup lang="ts">
 import { useWorkoutStore } from "~/stores/workoutStore";
 
+definePageMeta({
+  middleware: "auth",
+});
+
 const route = useRoute();
 const workoutStore = useWorkoutStore();
 const { supabase } = useSupabase();
