@@ -297,6 +297,215 @@
                   </div>
                 </div>
 
+                <!-- All Metrics Grid -->
+                <div>
+                  <p
+                    class="text-sm font-bold text-slate-900 dark:text-white uppercase mb-4 flex items-center gap-2"
+                  >
+                    <span
+                      class="w-1 h-4 bg-gradient-to-b from-blue-600 to-cyan-600 rounded-full"
+                    ></span>
+                    All Metrics Tracking
+                  </p>
+                  <div
+                    class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"
+                  >
+                    <!-- Weight Metric -->
+                    <div
+                      class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800"
+                    >
+                      <p
+                        class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase"
+                      >
+                        Weight
+                      </p>
+                      <p
+                        class="text-lg font-bold text-blue-900 dark:text-blue-100 mt-1"
+                      >
+                        {{ exStat.metrics.weight.current }}
+                        <span class="text-xs font-normal">kg</span>
+                      </p>
+                      <div
+                        :class="[
+                          'text-xs mt-2 flex items-center gap-1',
+                          exStat.metrics.weight.trend > 0
+                            ? 'text-green-600 dark:text-green-400'
+                            : exStat.metrics.weight.trend < 0
+                              ? 'text-orange-600 dark:text-orange-400'
+                              : 'text-slate-600 dark:text-slate-400',
+                        ]"
+                      >
+                        <span v-if="exStat.metrics.weight.trend > 0">📈</span>
+                        <span v-else-if="exStat.metrics.weight.trend < 0"
+                          >📉</span
+                        >
+                        <span v-else>➡️</span>
+                        <span
+                          >{{ exStat.metrics.weight.trend > 0 ? "+" : ""
+                          }}{{
+                            exStat.metrics.weight.trend.toFixed(1)
+                          }}
+                          kg</span
+                        >
+                      </div>
+                    </div>
+
+                    <!-- Sets Metric -->
+                    <div
+                      class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-900/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800"
+                    >
+                      <p
+                        class="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase"
+                      >
+                        Sets
+                      </p>
+                      <p
+                        class="text-lg font-bold text-purple-900 dark:text-purple-100 mt-1"
+                      >
+                        {{ exStat.metrics.sets.current }}
+                      </p>
+                      <div
+                        :class="[
+                          'text-xs mt-2 flex items-center gap-1',
+                          exStat.metrics.sets.trend > 0
+                            ? 'text-green-600 dark:text-green-400'
+                            : exStat.metrics.sets.trend < 0
+                              ? 'text-orange-600 dark:text-orange-400'
+                              : 'text-slate-600 dark:text-slate-400',
+                        ]"
+                      >
+                        <span v-if="exStat.metrics.sets.trend > 0">📈</span>
+                        <span v-else-if="exStat.metrics.sets.trend < 0"
+                          >📉</span
+                        >
+                        <span v-else>➡️</span>
+                        <span
+                          >{{ exStat.metrics.sets.trend > 0 ? "+" : ""
+                          }}{{ exStat.metrics.sets.trend }}</span
+                        >
+                      </div>
+                    </div>
+
+                    <!-- Reps Metric -->
+                    <div
+                      class="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/30 p-4 rounded-lg border border-emerald-200 dark:border-emerald-800"
+                    >
+                      <p
+                        class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase"
+                      >
+                        Reps
+                      </p>
+                      <p
+                        class="text-lg font-bold text-emerald-900 dark:text-emerald-100 mt-1"
+                      >
+                        {{ exStat.metrics.reps.current }}
+                      </p>
+                      <div
+                        :class="[
+                          'text-xs mt-2 flex items-center gap-1',
+                          exStat.metrics.reps.trend > 0
+                            ? 'text-green-600 dark:text-green-400'
+                            : exStat.metrics.reps.trend < 0
+                              ? 'text-orange-600 dark:text-orange-400'
+                              : 'text-slate-600 dark:text-slate-400',
+                        ]"
+                      >
+                        <span v-if="exStat.metrics.reps.trend > 0">📈</span>
+                        <span v-else-if="exStat.metrics.reps.trend < 0"
+                          >📉</span
+                        >
+                        <span v-else>➡️</span>
+                        <span
+                          >{{ exStat.metrics.reps.trend > 0 ? "+" : ""
+                          }}{{ exStat.metrics.reps.trend }}</span
+                        >
+                      </div>
+                    </div>
+
+                    <!-- Rest Time Metric -->
+                    <div
+                      class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-900/30 p-4 rounded-lg border border-orange-200 dark:border-orange-800"
+                    >
+                      <p
+                        class="text-xs font-bold text-orange-600 dark:text-orange-400 uppercase"
+                      >
+                        Rest Time
+                      </p>
+                      <p
+                        class="text-lg font-bold text-orange-900 dark:text-orange-100 mt-1"
+                      >
+                        {{ exStat.metrics.rest_time.current }}
+                        <span class="text-xs font-normal">min</span>
+                      </p>
+                      <div
+                        :class="[
+                          'text-xs mt-2 flex items-center gap-1',
+                          exStat.metrics.rest_time.trend < 0
+                            ? 'text-green-600 dark:text-green-400'
+                            : exStat.metrics.rest_time.trend > 0
+                              ? 'text-orange-600 dark:text-orange-400'
+                              : 'text-slate-600 dark:text-slate-400',
+                        ]"
+                      >
+                        <span v-if="exStat.metrics.rest_time.trend < 0"
+                          >📈</span
+                        >
+                        <span v-else-if="exStat.metrics.rest_time.trend > 0"
+                          >📉</span
+                        >
+                        <span v-else>➡️</span>
+                        <span
+                          >{{ exStat.metrics.rest_time.trend > 0 ? "+" : ""
+                          }}{{
+                            exStat.metrics.rest_time.trend.toFixed(1)
+                          }}
+                          min</span
+                        >
+                      </div>
+                    </div>
+
+                    <!-- Duration Metric -->
+                    <div
+                      class="bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-900/30 p-4 rounded-lg border border-pink-200 dark:border-pink-800"
+                    >
+                      <p
+                        class="text-xs font-bold text-pink-600 dark:text-pink-400 uppercase"
+                      >
+                        Duration
+                      </p>
+                      <p
+                        class="text-lg font-bold text-pink-900 dark:text-pink-100 mt-1"
+                      >
+                        {{ exStat.metrics.duration.current }}
+                        <span class="text-xs font-normal">min</span>
+                      </p>
+                      <div
+                        :class="[
+                          'text-xs mt-2 flex items-center gap-1',
+                          exStat.metrics.duration.trend > 0
+                            ? 'text-green-600 dark:text-green-400'
+                            : exStat.metrics.duration.trend < 0
+                              ? 'text-orange-600 dark:text-orange-400'
+                              : 'text-slate-600 dark:text-slate-400',
+                        ]"
+                      >
+                        <span v-if="exStat.metrics.duration.trend > 0">📈</span>
+                        <span v-else-if="exStat.metrics.duration.trend < 0"
+                          >📉</span
+                        >
+                        <span v-else>➡️</span>
+                        <span
+                          >{{ exStat.metrics.duration.trend > 0 ? "+" : ""
+                          }}{{
+                            exStat.metrics.duration.trend.toFixed(1)
+                          }}
+                          min</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Weight Stats Grid -->
                 <div class="grid grid-cols-2 gap-4">
                   <div
@@ -489,15 +698,49 @@ const exerciseStats = computed(() => {
       });
     })
     .map((exercise) => {
-      const history = workoutStore.historyByExercise(exercise.id);
-      const initialWeight =
-        history.length > 0 ? history[history.length - 1].weight : 0;
-      const totalIncrement = exercise.current_weight - initialWeight;
+      const exerciseHistory = workoutStore.exerciseHistoryByExercise(
+        exercise.id,
+      );
+      const initialRecord =
+        exerciseHistory.length > 0
+          ? exerciseHistory[0]
+          : { weight: 0, sets: 0, reps: 0, rest_time: 0, duration: 0 };
+      const lastRecord =
+        exerciseHistory.length > 0
+          ? exerciseHistory[exerciseHistory.length - 1]
+          : initialRecord;
 
       return {
         ...exercise,
-        history: history.reverse(), // from oldest to most recent
-        totalIncrement,
+        history: exerciseHistory,
+        totalIncrement: lastRecord.weight - initialRecord.weight,
+        metrics: {
+          weight: {
+            initial: initialRecord.weight,
+            current: lastRecord.weight,
+            trend: lastRecord.weight - initialRecord.weight,
+          },
+          sets: {
+            initial: initialRecord.sets,
+            current: lastRecord.sets,
+            trend: lastRecord.sets - initialRecord.sets,
+          },
+          reps: {
+            initial: initialRecord.reps,
+            current: lastRecord.reps,
+            trend: lastRecord.reps - initialRecord.reps,
+          },
+          rest_time: {
+            initial: initialRecord.rest_time,
+            current: lastRecord.rest_time,
+            trend: lastRecord.rest_time - initialRecord.rest_time,
+          },
+          duration: {
+            initial: initialRecord.duration,
+            current: lastRecord.duration,
+            trend: lastRecord.duration - initialRecord.duration,
+          },
+        },
       };
     });
 });
@@ -566,24 +809,30 @@ onMounted(async () => {
 
     workoutStore.setExercises(mappedExercises);
 
-    const { data: weightHistoryData, error: weightHistoryError } =
+    // Load exercise history
+    const { data: exerciseHistoryData, error: exerciseHistoryError } =
       await supabase
-        .from("weight_history")
+        .from("exercise_history")
         .select("*")
         .eq("user_id", authStore.userId)
         .order("date", { ascending: true });
 
-    if (weightHistoryError) throw weightHistoryError;
+    if (exerciseHistoryError) throw exerciseHistoryError;
 
-    // Map Italian field names to English
-    const mappedWeightHistory = (weightHistoryData || []).map((w: any) => ({
-      id: w.id,
-      exercise_id: w.exercise_id,
-      weight: Number(w.weight || w.peso || 0),
-      date: w.date || w.data,
-    }));
+    const mappedExerciseHistory = (exerciseHistoryData || []).map(
+      (eh: any) => ({
+        id: eh.id,
+        exercise_id: eh.exercise_id,
+        weight: Number(eh.weight || 0),
+        sets: Number(eh.sets || 0),
+        reps: Number(eh.reps || 0),
+        rest_time: Number(eh.rest_time || 0),
+        duration: Number(eh.duration || 0),
+        date: eh.date,
+      }),
+    );
 
-    workoutStore.setWeightHistory(mappedWeightHistory);
+    workoutStore.setExerciseHistory(mappedExerciseHistory);
   } catch (error) {
     console.error("Error loading statistics:", error);
   } finally {

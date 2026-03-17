@@ -20,6 +20,17 @@ interface WeightHistory {
   date: string;
 }
 
+interface ExerciseHistoryRecord {
+  id: string;
+  exercise_id: string;
+  weight: number;
+  sets: number;
+  reps: number;
+  rest_time: number;
+  duration: number;
+  date: string;
+}
+
 interface WorkoutPlan {
   id: string;
   name: string;
@@ -33,6 +44,7 @@ export const useWorkoutStore = defineStore("workout", {
     workoutPlans: [] as WorkoutPlan[],
     exercises: [] as Exercise[],
     weightHistory: [] as WeightHistory[],
+    exerciseHistory: [] as ExerciseHistoryRecord[],
     lastWorkoutPlanId: null as string | null,
     loading: false,
     error: null as string | null,
@@ -66,19 +78,41 @@ export const useWorkoutStore = defineStore("workout", {
         );
     },
 
-    weightTrend: (state) => (exerciseId: string) => {
-      const history = state.weightHistory
+    exerciseHistoryByExercise: (state) => (exerciseId: string) => {
+      return state.exerciseHistory
+        .filter((c) => c.exercise_id === exerciseId)
+        .sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+        );
+    },
+
+    exerciseMetricsTrend: (state) => (exerciseId: string) => {
+      const history = state.exerciseHistory
         .filter((c) => c.exercise_id === exerciseId)
         .sort(
           (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
         );
 
-      if (history.length < 2) return 0;
+      if (history.length < 2) {
+        return {
+          weight: 0,
+          sets: 0,
+          reps: 0,
+          rest_time: 0,
+          duration: 0,
+        };
+      }
 
-      const last = history[history.length - 1].weight;
-      const secondLast = history[history.length - 2].weight;
+      const last = history[history.length - 1];
+      const secondLast = history[history.length - 2];
 
-      return last - secondLast;
+      return {
+        weight: last.weight - secondLast.weight,
+        sets: last.sets - secondLast.sets,
+        reps: last.reps - secondLast.reps,
+        rest_time: last.rest_time - secondLast.rest_time,
+        duration: last.duration - secondLast.duration,
+      };
     },
   },
 
@@ -103,6 +137,10 @@ export const useWorkoutStore = defineStore("workout", {
       this.weightHistory = weightHistory;
     },
 
+    setExerciseHistory(exerciseHistory: ExerciseHistoryRecord[]) {
+      this.exerciseHistory = exerciseHistory;
+    },
+
     addWorkoutPlan(workoutPlan: WorkoutPlan) {
       this.workoutPlans.push(workoutPlan);
     },
@@ -113,6 +151,10 @@ export const useWorkoutStore = defineStore("workout", {
 
     addWeightRecord(record: WeightHistory) {
       this.weightHistory.push(record);
+    },
+
+    addExerciseHistoryRecord(record: ExerciseHistoryRecord) {
+      this.exerciseHistory.push(record);
     },
 
     updateExerciseWeight(exerciseId: string, newWeight: number) {

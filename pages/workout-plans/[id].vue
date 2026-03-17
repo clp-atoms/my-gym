@@ -698,22 +698,30 @@ onMounted(async () => {
       ...mappedExercises,
     ]);
 
-    const { data: weightHistory, error: weightHistoryError } = await supabase
-      .from("weight_history")
-      .select("*")
-      .eq("user_id", authStore.userId);
+    // Load exercise history
+    const { data: exerciseHistoryData, error: exerciseHistoryError } =
+      await supabase
+        .from("exercise_history")
+        .select("*")
+        .eq("user_id", authStore.userId)
+        .order("date", { ascending: true });
 
-    if (weightHistoryError) throw weightHistoryError;
+    if (exerciseHistoryError) throw exerciseHistoryError;
 
-    // Map Italian field names to English for weight_history
-    const mappedWeightHistory = (weightHistory || []).map((w: any) => ({
-      id: w.id,
-      exercise_id: w.exercise_id,
-      weight: Number(w.weight || w.peso || 0),
-      date: w.date || w.data,
-    }));
+    const mappedExerciseHistory = (exerciseHistoryData || []).map(
+      (eh: any) => ({
+        id: eh.id,
+        exercise_id: eh.exercise_id,
+        weight: Number(eh.weight || 0),
+        sets: Number(eh.sets || 0),
+        reps: Number(eh.reps || 0),
+        rest_time: Number(eh.rest_time || 0),
+        duration: Number(eh.duration || 0),
+        date: eh.date,
+      }),
+    );
 
-    workoutStore.setWeightHistory(mappedWeightHistory);
+    workoutStore.setExerciseHistory(mappedExerciseHistory);
 
     // Register this workout plan as the last one executed
     await workoutStore.setLastWorkoutPlanId(workoutPlanId);
@@ -754,15 +762,25 @@ const createExercise = async () => {
     if (data?.[0]) {
       workoutStore.addExercise(data[0]);
 
-      // Add initial weight history entry
-      await supabase.from("weight_history").insert([
-        {
-          exercise_id: data[0].id,
-          user_id: authStore.userId,
-          weight: newExercise.value.current_weight || 0,
-          date: new Date().toISOString(),
-        },
-      ]);
+      // Add initial exercise history entry with all metrics
+      const { error: historyError } = await supabase
+        .from("exercise_history")
+        .insert([
+          {
+            exercise_id: data[0].id,
+            user_id: authStore.userId,
+            weight: newExercise.value.current_weight || 0,
+            sets: newExercise.value.sets || 0,
+            reps: newExercise.value.reps || 0,
+            rest_time: newExercise.value.rest_time || 0,
+            duration: newExercise.value.duration || 0,
+            date: new Date().toISOString(),
+          },
+        ]);
+
+      if (historyError) {
+        console.error("Error creating exercise history:", historyError);
+      }
 
       newExercise.value = {
         name: "",
@@ -784,7 +802,8 @@ const createExercise = async () => {
 };
 
 const getTrend = (exerciseId: string) => {
-  return workoutStore.weightTrend(exerciseId);
+  const trend = workoutStore.exerciseMetricsTrend(exerciseId);
+  return trend.weight;
 };
 
 const openUpdateWeight = (exercise: any) => {
@@ -832,21 +851,23 @@ const saveExerciseChanges = async () => {
 
     if (error) throw error;
 
-    // If weight changed, add to weight history
-    if (weightChanged) {
-      const { error: historyError } = await supabase
-        .from("weight_history")
-        .insert([
-          {
-            exercise_id: editingExercise.value.id,
-            user_id: authStore.userId,
-            weight: editingExercise.value.current_weight || 0,
-            date: new Date().toISOString(),
-          },
-        ]);
+    // Always add to exercise history with all metrics
+    const { error: exerciseHistoryError } = await supabase
+      .from("exercise_history")
+      .insert([
+        {
+          exercise_id: editingExercise.value.id,
+          user_id: authStore.userId,
+          weight: editingExercise.value.current_weight || 0,
+          sets: editingExercise.value.sets || 0,
+          reps: editingExercise.value.reps || 0,
+          rest_time: editingExercise.value.rest_time || 0,
+          duration: editingExercise.value.duration || 0,
+          date: new Date().toISOString(),
+        },
+      ]);
 
-      if (historyError) throw historyError;
-    }
+    if (exerciseHistoryError) throw exerciseHistoryError;
 
     // Update store
     const exerciseIndex = workoutStore.exercises.findIndex(
@@ -878,14 +899,18 @@ const updateWeight = async () => {
 
     if (updateError) throw updateError;
 
-    // Add to weight history
+    // Add to exercise history with all metrics
     const { error: historyError } = await supabase
-      .from("weight_history")
+      .from("exercise_history")
       .insert([
         {
           exercise_id: selectedExercise.value.id,
           user_id: authStore.userId,
           weight: newWeight.value,
+          sets: selectedExercise.value.sets || 0,
+          reps: selectedExercise.value.reps || 0,
+          rest_time: selectedExercise.value.rest_time || 0,
+          duration: selectedExercise.value.duration || 0,
           date: new Date().toISOString(),
         },
       ]);
@@ -897,12 +922,27 @@ const updateWeight = async () => {
       newWeight.value,
     );
 
-    // Refresh history
-    const { data: weightHistory } = await supabase
-      .from("weight_history")
-      .select("*");
+    // Refresh exercise history
+    const { data: exerciseHistoryData } = await supabase
+      .from("exercise_history")
+      .select("*")
+      .eq("user_id", authStore.userId)
+      .order("date", { ascending: true });
 
-    workoutStore.setWeightHistory(weightHistory || []);
+    const mappedExerciseHistory = (exerciseHistoryData || []).map(
+      (eh: any) => ({
+        id: eh.id,
+        exercise_id: eh.exercise_id,
+        weight: Number(eh.weight || 0),
+        sets: Number(eh.sets || 0),
+        reps: Number(eh.reps || 0),
+        rest_time: Number(eh.rest_time || 0),
+        duration: Number(eh.duration || 0),
+        date: eh.date,
+      }),
+    );
+
+    workoutStore.setExerciseHistory(mappedExerciseHistory);
 
     isModalUpdateOpen.value = false;
     selectedExercise.value = null;
@@ -919,12 +959,13 @@ const deleteExercise = async (exerciseId: string) => {
   if (!confirmed) return;
 
   try {
-    const { error: deleteWeightHistoryError } = await supabase
-      .from("weight_history")
+    // Delete from exercise history
+    const { error: deleteExerciseHistoryError } = await supabase
+      .from("exercise_history")
       .delete()
       .eq("exercise_id", exerciseId);
 
-    if (deleteWeightHistoryError) throw deleteWeightHistoryError;
+    if (deleteExerciseHistoryError) throw deleteExerciseHistoryError;
 
     const { error } = await supabase
       .from("exercises")

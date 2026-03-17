@@ -6,11 +6,12 @@ A modern web app to manage gym workout plans with **Nuxt 4**, **Vue 3**, and **S
 
 - ✅ **Workout Plan Management** - Create and organize workout routines
 - ✅ **Exercise Tracking** - Add exercises with equipment, sets, reps, and weight
-- ✅ **Weight Progression Monitoring** - Visual charts with color-coded progress (green ↑ increase, orange ↓ decrease)
-- ✅ **Detailed Statistics** - Per-plan insights with KPI cards and weight history
+- ✅ **Multi-Metric Progression** - Track all exercise parameters: weight, sets, reps, rest time, and duration
+- ✅ **Visual Charts** - Color-coded progress charts with green ↑ (improvement) and orange ↓ (decrease)
+- ✅ **Detailed Statistics Dashboard** - Per-plan insights with KPI cards and metrics grid
+- ✅ **Automatic History Tracking** - Records all metrics every time you create or modify an exercise
 - ✅ **User Authentication** - Secure login with Supabase Auth
 - ✅ **Data Isolation** - Each user sees only their own data (RLS enabled)
-- ✅ **Weight History Tracking** - Complete record of your strength evolution
 - ✅ **Cross-Device Sync** - Last opened workout plan synced across devices/browsers via Supabase
 - ✅ **Responsive Design** - Mobile, tablet, and desktop optimized
 - ✅ **Dark Mode** - Built-in dark theme
@@ -63,7 +64,7 @@ Run the SQL from [SUPABASE_COMPLETE_SETUP.md](./SUPABASE_COMPLETE_SETUP.md) in S
 
 - `workout_plans` - Your training routines
 - `exercises` - Individual exercises in a plan
-- `weight_history` - Track weight progression per exercise
+- `exercise_history` - Track all exercise metrics over time (weight, sets, reps, rest_time, duration)
 - `user_preferences` - Store user preferences (last workout plan opened, synced across devices)
 
 #### Enable Row Level Security (RLS)

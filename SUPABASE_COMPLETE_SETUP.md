@@ -63,12 +63,12 @@ If you prefer to have email confirmation:
 
 Before creating the tables, here's what each one does:
 
-| Table                | Purpose                                                                             |
-| -------------------- | ----------------------------------------------------------------------------------- |
-| **workout_plans**    | Store user's workout routines (e.g., "Upper Body", "Lower Body")                    |
-| **exercises**        | Individual exercises within a workout plan (e.g., "Bench Press")                    |
-| **weight_history**   | Track weight progression over time for each exercise                                |
-| **user_preferences** | Store user preferences like `last_workout_plan_id` (synced across devices/browsers) |
+| Table                | Purpose                                                                                      |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| **workout_plans**    | Store user's workout routines (e.g., "Upper Body", "Lower Body")                             |
+| **exercises**        | Individual exercises within a workout plan (e.g., "Bench Press")                             |
+| **exercise_history** | Track all exercise metrics over time: weight, sets, reps, rest_time, duration with timestamp |
+| **user_preferences** | Store user preferences like `last_workout_plan_id` (synced across devices/browsers)          |
 
 ---
 
@@ -113,13 +113,17 @@ CREATE TABLE IF NOT EXISTS exercises (
 );
 
 -- ============================================
--- TABLE: weight_history
+-- TABLE: exercise_history
 -- ============================================
-CREATE TABLE IF NOT EXISTS weight_history (
+CREATE TABLE IF NOT EXISTS exercise_history (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   exercise_id UUID NOT NULL REFERENCES exercises(id) ON DELETE CASCADE,
-  weight NUMERIC NOT NULL,
+  weight NUMERIC DEFAULT 0,
+  sets INTEGER DEFAULT 0,
+  reps INTEGER DEFAULT 0,
+  rest_time INTEGER DEFAULT 0,
+  duration INTEGER DEFAULT 0,
   date TIMESTAMP DEFAULT NOW(),
   created_at TIMESTAMP DEFAULT NOW()
 );
@@ -142,8 +146,9 @@ CREATE TABLE IF NOT EXISTS user_preferences (
 CREATE INDEX IF NOT EXISTS workout_plans_user_id_idx ON workout_plans(user_id);
 CREATE INDEX IF NOT EXISTS exercises_user_id_idx ON exercises(user_id);
 CREATE INDEX IF NOT EXISTS exercises_workout_plan_id_idx ON exercises(workout_plan_id);
-CREATE INDEX IF NOT EXISTS weight_history_user_id_idx ON weight_history(user_id);
-CREATE INDEX IF NOT EXISTS weight_history_exercise_id_idx ON weight_history(exercise_id);
+CREATE INDEX IF NOT EXISTS exercise_history_user_id_idx ON exercise_history(user_id);
+CREATE INDEX IF NOT EXISTS exercise_history_exercise_id_idx ON exercise_history(exercise_id);
+CREATE INDEX IF NOT EXISTS exercise_history_date_idx ON exercise_history(date);
 CREATE INDEX IF NOT EXISTS user_preferences_user_id_idx ON user_preferences(user_id);
 ```
 
@@ -156,7 +161,7 @@ CREATE INDEX IF NOT EXISTS user_preferences_user_id_idx ON user_preferences(user
 2. **Verify that you see:**
    - ✅ `workout_plans`
    - ✅ `exercises`
-   - ✅ `weight_history`
+   - ✅ `exercise_history`
    - ✅ `user_preferences`
 
 ---
@@ -166,7 +171,7 @@ CREATE INDEX IF NOT EXISTS user_preferences_user_id_idx ON user_preferences(user
 ### Step 4.1: Enable RLS
 
 1. **Go to Authentication** → **Policies**
-2. **For each table** (`workout_plans`, `exercises`, `weight_history`, `user_preferences`):
+2. **For each table** (`workout_plans`, `exercises`, `exercise_history`, `user_preferences`):
    - Select it
    - Click **"Enable RLS"**
 
@@ -216,23 +221,23 @@ CREATE POLICY "Users can delete their own exercises"
   USING (auth.uid() = user_id);
 
 -- ============================================
--- POLICIES: weight_history
+-- POLICIES: exercise_history
 -- ============================================
-CREATE POLICY "Users can see their own weight history"
-  ON weight_history FOR SELECT
+CREATE POLICY "Users can see their own exercise history"
+  ON exercise_history FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can insert their own weight history"
-  ON weight_history FOR INSERT
+CREATE POLICY "Users can insert their own exercise history"
+  ON exercise_history FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can update their own weight history"
-  ON weight_history FOR UPDATE
+CREATE POLICY "Users can update their own exercise history"
+  ON exercise_history FOR UPDATE
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can delete their own weight history"
-  ON weight_history FOR DELETE
+CREATE POLICY "Users can delete their own exercise history"
+  ON exercise_history FOR DELETE
   USING (auth.uid() = user_id);
 
 -- ============================================
@@ -264,7 +269,7 @@ CREATE POLICY "Users can delete their own preferences"
 2. **Select each table and verify you see:**
    - 4 policies for `workout_plans`
    - 4 policies for `exercises`
-   - 4 policies for `weight_history`
+   - 4 policies for `exercise_history`
    - 4 policies for `user_preferences`
 
 ---
