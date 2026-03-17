@@ -8,17 +8,37 @@ const URLS_TO_CACHE = [
   "/icons/icon-512x512.png",
 ];
 
+// Track manifest version for iOS cache busting
+let manifestVersion = null;
+
+// Fetch and cache manifest version on install
+async function getAndCacheManifestVersion() {
+  try {
+    const response = await fetch("/manifest.json");
+    const manifest = await response.json();
+    manifestVersion = manifest.version;
+    console.log("[SW] Manifest version loaded:", manifestVersion);
+    return manifestVersion;
+  } catch (err) {
+    console.warn("[SW] Failed to fetch manifest version:", err);
+    return null;
+  }
+}
+
 // Install event - cache essential files
 self.addEventListener("install", (event) => {
   console.log("Service Worker installing, cache:", CACHE_NAME);
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(URLS_TO_CACHE).catch((err) => {
-        console.warn("Cache addAll error:", err);
-        // Don't fail installation if some files can't be cached
-        return Promise.resolve();
-      });
-    }),
+    Promise.all([
+      getAndCacheManifestVersion(),
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.addAll(URLS_TO_CACHE).catch((err) => {
+          console.warn("Cache addAll error:", err);
+          // Don't fail installation if some files can't be cached
+          return Promise.resolve();
+        });
+      }),
+    ]),
   );
   // Don't skip waiting immediately - let it wait for client switch
   // This ensures smooth update transitions
@@ -70,6 +90,27 @@ self.addEventListener("message", (event) => {
             type: "TEST_AVAILABLE",
           });
         });
+
+  // Check for manifest version update (iOS cache busting)
+  if (event.data?.type === "CHECK_MANIFEST_VERSION") {
+    console.log("[SW] Checking manifest version...");
+    getAndCacheManifestVersion().then((newVersion) => {
+      console.log(
+        "[SW] Manifest version check - Current:",
+        manifestVersion,
+        "New:",
+        newVersion,
+      );
+      if (newVersion && newVersion !== manifestVersion && event.ports[0]) {
+        event.ports[0].postMessage({
+          type: "MANIFEST_VERSION_CHANGED",
+          oldVersion: manifestVersion,
+          newVersion: newVersion,
+        });
+        manifestVersion = newVersion;
+      }
+    });
+  }
       });
     });
   }
@@ -84,6 +125,35 @@ self.addEventListener("fetch", (event) => {
 
   // Skip Vite HMR and dev server files
   if (
+  // For manifest and critical HTML/CSS on iOS, prefer network-first
+  // This ensures iOS devices get updated styles immediately
+  const isManifest = event.request.url.includes("manifest.json");
+  const isDocument =
+    event.request.destination === "document" ||
+    event.request.url.endsWith("/");
+
+  if (isManifest || isDocument) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Only cache successful responses
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache).catch(() => {});
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Offline: fall back to cache
+          return caches.match(event.request);
+        }),
+    );
+    return;
+  }
+
+  // For other assets, use cache-first strategy
     event.request.url.includes("/_nuxt/") ||
     event.request.url.includes("/@vite") ||
     event.request.url.includes("@id/") ||

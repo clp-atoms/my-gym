@@ -165,6 +165,9 @@
         <p class="text-sm text-slate-500 dark:text-slate-500 mt-2">
           Built with Nuxt 4 + Supabase
         </p>
+        <p class="text-xs text-slate-400 dark:text-slate-600 mt-4">
+          v{{ pwaVersion }}
+        </p>
       </div>
     </footer>
 
@@ -175,11 +178,14 @@
 
 <script setup lang="ts">
 import "~/assets/css/main.css";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const authStore = useAuthStore();
 const router = useRouter();
 const isMenuOpen = ref(false);
+
+// PWA Version
+const { version: pwaVersion } = usePWAVersion();
 
 // PWA Meta Tags
 useHead({

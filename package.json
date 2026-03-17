@@ -7,7 +7,10 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "pwa:version:patch": "bash scripts/bump-pwa-version.sh patch",
+    "pwa:version:minor": "bash scripts/bump-pwa-version.sh minor",
+    "pwa:version:major": "bash scripts/bump-pwa-version.sh major"
   },
   "dependencies": {
     "@nuxt/ui": "^4.5.1",
