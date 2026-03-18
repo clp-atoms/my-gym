@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#059669",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "categories": ["fitness", "health", "productivity"],
   "icons": [
     {
