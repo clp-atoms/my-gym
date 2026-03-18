@@ -90,6 +90,9 @@ self.addEventListener("message", (event) => {
             type: "TEST_AVAILABLE",
           });
         });
+      });
+    });
+  }
 
   // Check for manifest version update (iOS cache busting)
   if (event.data?.type === "CHECK_MANIFEST_VERSION") {
@@ -111,9 +114,6 @@ self.addEventListener("message", (event) => {
       }
     });
   }
-      });
-    });
-  }
 });
 
 // Fetch event - serve from cache, fallback to network
@@ -125,12 +125,32 @@ self.addEventListener("fetch", (event) => {
 
   // Skip Vite HMR and dev server files
   if (
+    event.request.url.includes("/_nuxt/") ||
+    event.request.url.includes("/@vite") ||
+    event.request.url.includes("@id/") ||
+    event.request.url.includes(".hot-update")
+  ) {
+    return;
+  }
+
+  // Skip API requests - always use network
+  if (
+    event.request.url.includes("/.netlify/") ||
+    event.request.url.includes("supabase")
+  ) {
+    return;
+  }
+
+  // Skip chrome-extension and other non-http schemes
+  if (!event.request.url.startsWith("http")) {
+    return;
+  }
+
   // For manifest and critical HTML/CSS on iOS, prefer network-first
   // This ensures iOS devices get updated styles immediately
   const isManifest = event.request.url.includes("manifest.json");
   const isDocument =
-    event.request.destination === "document" ||
-    event.request.url.endsWith("/");
+    event.request.destination === "document" || event.request.url.endsWith("/");
 
   if (isManifest || isDocument) {
     event.respondWith(
@@ -154,27 +174,6 @@ self.addEventListener("fetch", (event) => {
   }
 
   // For other assets, use cache-first strategy
-    event.request.url.includes("/_nuxt/") ||
-    event.request.url.includes("/@vite") ||
-    event.request.url.includes("@id/") ||
-    event.request.url.includes(".hot-update")
-  ) {
-    return;
-  }
-
-  // Skip API requests - always use network
-  if (
-    event.request.url.includes("/.netlify/") ||
-    event.request.url.includes("supabase")
-  ) {
-    return;
-  }
-
-  // Skip chrome-extension and other non-http schemes
-  if (!event.request.url.startsWith("http")) {
-    return;
-  }
-
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) {

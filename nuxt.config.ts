@@ -23,5 +23,29 @@ export default defineNuxtConfig({
         port: 3000,
       },
     },
+    build: {
+      rollupOptions: {
+        output: {
+          entryFileNames: "_nuxt/[name].[hash].js",
+          chunkFileNames: "_nuxt/[name].[hash].js",
+          assetFileNames: "_nuxt/[name].[hash][extname]",
+        },
+      },
+    },
   },
+  // Nitro configuration for Netlify deployment
+  nitro: {
+    publicAssets: [
+      {
+        baseURL: "/",
+        dir: "./public",
+      },
+    ],
+    headers: {
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "SAMEORIGIN",
+    },
+  },
+  // SSR enabled for Netlify
+  ssr: true,
 });
